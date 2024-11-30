@@ -1,0 +1,14 @@
+.idea
+.vscode
+.DS_Store
+dist
+__pycache__
+*.iml
+.pytest_cache
+.mypy_cache
+.coverage*
+.ruff_cache
+htmlcov
+src/crawler/_version.py
+.env
+*.log*
