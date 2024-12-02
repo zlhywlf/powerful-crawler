@@ -18,6 +18,7 @@ class QuotesSpider(scrapy.Spider):
     custom_settings: ClassVar[dict[_SettingsKeyT, Any]] = {  # type: ignore [misc]
         "LOG_FORMAT": "%(asctime)s.%(msecs)03d | %(levelname)-8s | %(name)s.%(module)s:%(funcName)s:%(lineno)d - "
         "%(message)s",
+        "ITEM_PIPELINES": {"crawler.QuotesSpider.QuotesPipeline": 1},
     }
     start_urls: ClassVar[list[str]] = [  # type: ignore [misc]
         "https://quotes.toscrape.com/tag/humor/",
@@ -34,3 +35,12 @@ class QuotesSpider(scrapy.Spider):
         next_page = response.css('li.next a::attr("href")').get()
         if next_page is not None:
             yield response.follow(next_page, self.parse)  # type: ignore [arg-type]
+
+
+class QuotesPipeline:
+    """demo."""
+
+    def process_item(self, item: dict[str, Any], spider: QuotesSpider) -> dict[str, Any]:
+        """Process item."""
+        spider.log(item | {"id": 1})
+        return item
