@@ -11,6 +11,13 @@ from scrapy.http.response import Response
 from scrapy.settings import _SettingsKeyT
 
 
+class QuotesItem(scrapy.Item):
+    """demo."""
+
+    author = scrapy.Field()
+    text = scrapy.Field()
+
+
 class QuotesSpider(scrapy.Spider):
     """demo."""
 
@@ -27,10 +34,10 @@ class QuotesSpider(scrapy.Spider):
     def parse(self, response: Response) -> Generator[Any, Any, None]:
         """Parse."""
         for quote in response.css("div.quote"):
-            yield {
-                "author": quote.xpath("span/small/text()").get(),
-                "text": quote.css("span.text::text").get(),
-            }
+            yield QuotesItem(
+                author=quote.xpath("span/small/text()").get(),
+                text=quote.css("span.text::text").get(),
+            )
 
         next_page = response.css('li.next a::attr("href")').get()
         if next_page is not None:
@@ -40,7 +47,7 @@ class QuotesSpider(scrapy.Spider):
 class QuotesPipeline:
     """demo."""
 
-    def process_item(self, item: dict[str, Any], spider: QuotesSpider) -> dict[str, Any]:
+    def process_item(self, item: QuotesItem, spider: QuotesSpider) -> QuotesItem:
         """Process item."""
-        spider.log(item | {"id": 1})
+        spider.log(item)
         return item
