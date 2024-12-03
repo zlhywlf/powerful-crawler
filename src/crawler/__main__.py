@@ -3,12 +3,18 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
+import os
+
 from scrapy.cmdline import execute
+from scrapy.utils.project import ENVVAR, get_project_settings
 
 
 def main() -> None:
     """The powerful crawler application."""
-    execute(["scrapy", "runspider", "QuotesSpider.py"])
+    os.environ.setdefault(ENVVAR, __name__)
+    settings = get_project_settings()
+    settings.setdict({"SPIDER_MODULES": "crawler.spiders"}, priority="project")
+    execute(["scrapy", "crawl", "quotes"], settings)
 
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ class QuotesSpider(scrapy.Spider):
     custom_settings: ClassVar[dict[_SettingsKeyT, Any]] = {  # type: ignore [misc]
         "LOG_FORMAT": "%(asctime)s.%(msecs)03d | %(levelname)-8s | %(name)s.%(module)s:%(funcName)s:%(lineno)d - "
         "%(message)s",
-        "ITEM_PIPELINES": {"crawler.QuotesSpider.QuotesPipeline": 1},
+        "ITEM_PIPELINES": {"crawler.spiders.QuotesPipeline": 1},
     }
     start_urls: ClassVar[list[str]] = [  # type: ignore [misc]
         "https://quotes.toscrape.com/tag/humor/",
