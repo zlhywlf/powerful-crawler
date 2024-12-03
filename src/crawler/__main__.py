@@ -14,7 +14,7 @@ def main() -> None:
     os.environ.setdefault(ENVVAR, __name__)
     settings = get_project_settings()
     settings.setdict({"SPIDER_MODULES": "crawler.spiders"}, priority="project")
-    execute(["scrapy", "crawl", "quotes"], settings)
+    execute(["scrapy", "crawl", "Quotes"], settings)
 
 
 if __name__ == "__main__":
