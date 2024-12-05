@@ -3,7 +3,6 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
-import asyncio
 import os
 from collections.abc import Generator
 from pathlib import Path
@@ -16,10 +15,6 @@ from sqlalchemy.dialects.sqlite import INTEGER, VARCHAR
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import selectinload
 from sqlmodel import Column, Field, ForeignKey, Relationship, SQLModel
-
-db = Path(os.environ["USERPROFILE"]) / "Projects" / "public" / "laboratory" / "identifier.sqlite"
-_configs: list["Spider"] = []
-g = globals()
 
 
 class Spider(SQLModel, table=True):
@@ -38,33 +33,6 @@ class Url(SQLModel, table=True):
     id: int = Field(None, sa_column=Column(INTEGER(), primary_key=True))
     spider_id: int = Field(None, sa_column=Column(INTEGER(), ForeignKey("spider.id")))
     url: str = Field(None, sa_column=Column(VARCHAR()))
-
-
-async def main() -> None:
-    """Main."""
-    global _configs
-    engine = create_async_engine(f"sqlite+aiosqlite:///{db}", echo=True)
-    async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.drop_all)
-        await conn.run_sync(SQLModel.metadata.create_all)
-    async_session = async_sessionmaker(engine, expire_on_commit=False)
-    async with async_session() as session:
-        async with session.begin():
-            session.add_all([
-                Spider(
-                    name="Quotes",
-                    parse="parse",
-                    process_item="process_item",
-                    start_urls=[Url(spider_id=1, url="https://quotes.toscrape.com/tag/humor/")],
-                )
-            ])
-        stmt = select(Spider).options(selectinload(Spider.start_urls))  # type:ignore  [arg-type]
-        result = await session.execute(stmt)
-        _configs = list(result.scalars())
-    await engine.dispose()
-
-
-asyncio.run(main())
 
 
 class SpiderItem(scrapy.Item):
@@ -93,27 +61,52 @@ def process_item(obj: object, item: SpiderItem, spider: scrapy.Spider) -> Spider
     return item
 
 
-for config in _configs:
-    name = config.name
-    spider_name = f"{name}Spider"
-    pipeliner_name = f"{name}Pipeline"
-    parse_func = g[config.parse]
-    process_item_func = g[config.process_item]
-    g.setdefault(
-        spider_name,
-        type(
+async def init() -> None:
+    """Init."""
+    db = Path(os.environ["USERPROFILE"]) / "Projects" / "public" / "laboratory" / "identifier.sqlite"
+    _configs: list[Spider] = []
+    g = globals()
+    engine = create_async_engine(f"sqlite+aiosqlite:///{db}", echo=True)
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.drop_all)
+        await conn.run_sync(SQLModel.metadata.create_all)
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
+    async with async_session() as session:
+        async with session.begin():
+            session.add_all([
+                Spider(
+                    name="Quotes",
+                    parse="parse",
+                    process_item="process_item",
+                    start_urls=[Url(spider_id=1, url="https://quotes.toscrape.com/tag/humor/")],
+                )
+            ])
+        stmt = select(Spider).options(selectinload(Spider.start_urls))  # type:ignore  [arg-type]
+        result = await session.execute(stmt)
+        _configs = list(result.scalars())
+    await engine.dispose()
+    for config in _configs:
+        name = config.name
+        spider_name = f"{name}Spider"
+        pipeliner_name = f"{name}Pipeline"
+        parse_func = g[config.parse]
+        process_item_func = g[config.process_item]
+        g.setdefault(
             spider_name,
-            (scrapy.Spider,),
-            {
-                "name": name,
-                "custom_settings": {
-                    "LOG_FORMAT": "%(asctime)s.%(msecs)03d | %(levelname)-8s | "
-                    "%(name)s.%(module)s:%(funcName)s:%(lineno)d - %(message)s",
-                    "ITEM_PIPELINES": {f"crawler.spiders.{pipeliner_name}": 1},
+            type(
+                spider_name,
+                (scrapy.Spider,),
+                {
+                    "name": name,
+                    "custom_settings": {
+                        "LOG_FORMAT": "%(asctime)s.%(msecs)03d | %(levelname)-8s | "
+                        "%(name)s.%(module)s:%(funcName)s:%(lineno)d - %(message)s",
+                        "ITEM_PIPELINES": {f"crawler.spiders.{pipeliner_name}": 1},
+                        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+                    },
+                    "start_urls": [_.url for _ in config.start_urls],
+                    "parse": parse_func,
                 },
-                "start_urls": [_.url for _ in config.start_urls],
-                "parse": parse_func,
-            },
-        ),
-    )
-    g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": process_item_func}))
+            ),
+        )
+        g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": process_item_func}))
