@@ -18,7 +18,8 @@ class FakeRedisClient(RedisClient):
         self._redis = redis
 
     @classmethod
-    def from_url(cls) -> RedisClient:
+    @override
+    def from_url(cls, url: str, **kwargs: Any) -> RedisClient:
         """Create client."""
         return cls(FakeAsyncRedis())
 

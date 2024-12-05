@@ -17,3 +17,8 @@ class RedisClient(ABC):
     @abstractmethod
     async def get(self, name: str) -> Any:  # noqa: ANN401
         """Get."""
+
+    @classmethod
+    @abstractmethod
+    def from_url(cls, url: str, **kwargs: Any) -> "RedisClient":
+        """Create instance."""
