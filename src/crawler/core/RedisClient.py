@@ -4,7 +4,7 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Self
 
 
 class RedisClient(ABC):
@@ -20,5 +20,5 @@ class RedisClient(ABC):
 
     @classmethod
     @abstractmethod
-    def from_url(cls, url: str, **kwargs: Any) -> "RedisClient":
+    def from_url(cls, url: str, **kwargs: Any) -> Self:
         """Create instance."""

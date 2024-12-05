@@ -3,7 +3,7 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
-from typing import Any, override
+from typing import Any, Self, override
 
 from fakeredis import FakeAsyncRedis
 
@@ -19,7 +19,7 @@ class FakeRedisClient(RedisClient):
 
     @classmethod
     @override
-    def from_url(cls, url: str, **kwargs: Any) -> RedisClient:
+    def from_url(cls, url: str, **kwargs: Any) -> Self:
         """Create client."""
         return cls(FakeAsyncRedis())
 
