@@ -11,17 +11,17 @@ from crawler.clients import get_redis, get_redis_from_settings
 from crawler.congfig import REDIS_CLS, REDIS_PARAMS
 
 
-async def test_default_instance(faker: Faker) -> None:
+def test_default_instance(faker: Faker) -> None:
     """Test default instance."""
     redis = get_redis()
     k = faker.name()
     v = faker.name()
-    await redis.set(k, v)
+    redis.set(k, v)
     assert isinstance(redis, REDIS_CLS)
-    assert await redis.get(k) == v.encode()
+    assert redis.get(k) == v.encode()
 
 
-async def test_custom_class(faker: Faker, mocker: MockerFixture) -> None:
+def test_custom_class(faker: Faker, mocker: MockerFixture) -> None:
     """Test custom class."""
     redis_cls = mocker.Mock()
     url = faker.url()
@@ -31,13 +31,13 @@ async def test_custom_class(faker: Faker, mocker: MockerFixture) -> None:
     redis_cls.from_url.assert_called_with(url=url, other=other)
 
 
-async def test_default_instance_from_settings() -> None:
+def test_default_instance_from_settings() -> None:
     """Test default instance from settings."""
     redis = get_redis_from_settings(Settings())
     assert isinstance(redis, REDIS_CLS)
 
 
-async def test_custom_class_from_settings() -> None:
+def test_custom_class_from_settings() -> None:
     """Test custom class from settings."""
     settings = Settings({
         "REDIS_CLS": f"{REDIS_CLS.__module__}.{REDIS_CLS.__name__}",
@@ -46,7 +46,7 @@ async def test_custom_class_from_settings() -> None:
     assert isinstance(redis, REDIS_CLS)
 
 
-async def test_params_from_settings(faker: Faker, mocker: MockerFixture) -> None:
+def test_params_from_settings(faker: Faker, mocker: MockerFixture) -> None:
     """Test default params from settings."""
     expected_params = {"timeout": faker.random_digit(), "flag": faker.boolean(), "url": faker.url()}
     redis_cls = mocker.Mock()

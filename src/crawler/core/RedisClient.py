@@ -11,14 +11,22 @@ class RedisClient(ABC):
     """redis client."""
 
     @abstractmethod
-    async def set(self, name: str, value: str | float) -> None:
+    def set(self, name: str, value: str | float) -> None:
         """Set."""
 
     @abstractmethod
-    async def get(self, name: str) -> Any:  # noqa: ANN401
+    def get(self, name: str) -> Any:  # noqa: ANN401
         """Get."""
 
     @classmethod
     @abstractmethod
     def from_url(cls, url: str, **kwargs: Any) -> Self:
         """Create instance."""
+
+    @abstractmethod
+    def sadd(self, name: str, value: str | float) -> int:
+        """Add to set."""
+
+    @abstractmethod
+    def delete(self, name: str) -> None:
+        """Delete."""

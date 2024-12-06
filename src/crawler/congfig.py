@@ -13,3 +13,5 @@ REDIS_PARAMS = {
     "retry_on_timeout": True,
     "encoding": REDIS_ENCODING,
 }
+
+DUPEFILTER_KEY = "dupefilter:%(timestamp)s"
