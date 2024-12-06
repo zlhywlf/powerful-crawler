@@ -14,4 +14,4 @@ REDIS_PARAMS = {
     "encoding": REDIS_ENCODING,
 }
 
-DUPEFILTER_KEY = "dupefilter:%(timestamp)s"
+DUPE_FILTER_KEY = "dupe_filter:%(timestamp)s"
