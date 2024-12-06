@@ -6,6 +6,8 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 from abc import ABC, abstractmethod
 from typing import Any, Self
 
+from redis.client import Pipeline
+
 
 class RedisClient(ABC):
     """redis client."""
@@ -30,3 +32,15 @@ class RedisClient(ABC):
     @abstractmethod
     def delete(self, name: str) -> None:
         """Delete."""
+
+    @abstractmethod
+    def zcard(self, name: str) -> int:
+        """Zcard."""
+
+    @abstractmethod
+    def execute_command(self, *args: Any, **options: Any) -> None:
+        """Execute command."""
+
+    @abstractmethod
+    def pipeline(self) -> Pipeline:
+        """Pipeline."""

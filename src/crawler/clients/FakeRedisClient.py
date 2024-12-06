@@ -6,6 +6,7 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 from typing import Any, Self, override
 
 from fakeredis import FakeStrictRedis
+from redis.client import Pipeline
 
 from crawler.core.RedisClient import RedisClient
 
@@ -39,3 +40,16 @@ class FakeRedisClient(RedisClient):
     @override
     def delete(self, name: str) -> None:
         self._redis.delete(name)
+
+    @override
+    def zcard(self, name: str) -> int:
+        res = self._redis.zcard(name)
+        return res if isinstance(res, int) else -1
+
+    @override
+    def execute_command(self, *args: Any, **options: Any) -> None:
+        self._redis.execute_command(*args, **options)  # type:ignore [no-untyped-call]
+
+    @override
+    def pipeline(self) -> Pipeline:
+        return self._redis.pipeline()
