@@ -10,7 +10,7 @@ from scrapy import Request, Spider
 from crawler.clients.FakeRedisClient import FakeRedisClient
 from crawler.core.BaseQueue import BaseQueue
 from crawler.core.QueueClient import QueueClient
-from crawler.framework.scrapy.PriorityQueue import PriorityQueue
+from crawler.frameworks.scrapy.PriorityQueue import PriorityQueue
 
 
 @pytest.fixture

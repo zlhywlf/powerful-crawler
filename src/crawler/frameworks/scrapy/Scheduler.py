@@ -23,7 +23,7 @@ from crawler.congfig import (
 )
 from crawler.core.BaseQueue import BaseQueue
 from crawler.core.QueueClient import QueueClient
-from crawler.framework.scrapy.RFPDupeFilter import RFPDupeFilter
+from crawler.frameworks.scrapy.RFPDupeFilter import RFPDupeFilter
 
 
 class Scheduler(BaseScheduler):

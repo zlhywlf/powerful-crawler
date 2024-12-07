@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel
 
 from crawler.congfig import LOG_FORMAT, NAME, REDIS_CLS, TWISTED_REACTOR
-from crawler.framework.scrapy.PowerfulSpider import PowerfulSpider
+from crawler.frameworks.scrapy.PowerfulSpider import PowerfulSpider
 from crawler.models.Result import Result
 from crawler.models.Target import Target
 

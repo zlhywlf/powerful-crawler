@@ -16,10 +16,10 @@ REDIS_PARAMS = {
 DUPE_FILTER_KEY = "dupe_filter:%(timestamp)s"
 
 SCHEDULER_QUEUE_KEY = "%(spider)s:requests"
-SCHEDULER_QUEUE_CLASS = "crawler.framework.scrapy.PriorityQueue.PriorityQueue"
+SCHEDULER_QUEUE_CLASS = "crawler.frameworks.scrapy.PriorityQueue.PriorityQueue"
 
 SCHEDULER_DUPE_FILTER_KEY = "%(spider)s:dupe_filter"
-SCHEDULER_DUPE_FILTER_CLASS = "crawler.framework.scrapy.RFPDupeFilter.RFPDupeFilter"
+SCHEDULER_DUPE_FILTER_CLASS = "crawler.frameworks.scrapy.RFPDupeFilter.RFPDupeFilter"
 
 LOG_FORMAT = "%(asctime)s.%(msecs)03d | %(levelname)-8s | %(name)s.%(module)s:%(funcName)s:%(lineno)d - %(message)s"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
