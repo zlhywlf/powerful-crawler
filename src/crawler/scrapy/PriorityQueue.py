@@ -20,14 +20,10 @@ class PriorityQueue(BaseQueue):
     @override
     def push(self, request: Request) -> None:
         data = self.encode_request(request)
-        score = -request.priority
+        score = request.priority
         self.client.execute_command("ZADD", self.key, score, data)
 
     @override
     def pop(self, timeout: int = 0) -> Request | None:
-        pip = self.client.pipeline()
-        pip.multi()
-        pip.zrange(self.key, 0, 0)
-        pip.zremrangebyrank(self.key, 0, 0)
-        results, _ = pip.execute()  # type:ignore [no-untyped-call]
+        results = self.client.pop_priority(self.key, min_=-1, max_=-1)
         return self.decode_request(results[0]) if results else None

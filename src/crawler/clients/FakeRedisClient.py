@@ -6,7 +6,6 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 from typing import Any, Self, override
 
 from fakeredis import FakeStrictRedis
-from redis.client import Pipeline
 
 from crawler.core.QueueClient import QueueClient
 
@@ -51,5 +50,10 @@ class FakeRedisClient(QueueClient):
         self._redis.execute_command(*args, **options)  # type:ignore [no-untyped-call]
 
     @override
-    def pipeline(self) -> Pipeline:
-        return self._redis.pipeline()
+    def pop_priority(self, key: str, start: int = 0, end: int = 0, min_: int = 0, max_: int = 0) -> list[Any]:
+        with self._redis.pipeline() as pip:
+            pip.multi()
+            pip.zrevrange(key, start, end)
+            pip.zremrangebyrank(key, min_, max_)
+            results: list[Any] = pip.execute()[0]
+        return results

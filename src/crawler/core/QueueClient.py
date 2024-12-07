@@ -6,8 +6,6 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 from abc import ABC, abstractmethod
 from typing import Any, Self
 
-from redis.client import Pipeline
-
 
 class QueueClient(ABC):
     """queue client."""
@@ -42,5 +40,5 @@ class QueueClient(ABC):
         """Execute command."""
 
     @abstractmethod
-    def pipeline(self) -> Pipeline:
-        """Pipeline."""
+    def pop_priority(self, key: str, start: int = 0, end: int = 0, min_: int = 0, max_: int = 0) -> list[Any]:
+        """Pop priority."""
