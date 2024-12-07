@@ -3,6 +3,7 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
+import asyncio
 import json
 import threading
 from collections.abc import AsyncGenerator, Callable
@@ -106,3 +107,6 @@ async def init() -> None:
 
     cls = g.get(spider_name)
     cls.__init__ = wrapper(cls.__init__)  # type:ignore  [misc]
+
+
+asyncio.run(init())
