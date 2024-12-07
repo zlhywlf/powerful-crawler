@@ -6,6 +6,7 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 from faker import Faker
 from pytest_mock import MockerFixture
 from scrapy.settings import Settings
+from scrapy.utils.misc import load_object
 
 from crawler.clients import get_redis, get_redis_from_settings
 from crawler.congfig import REDIS_CLS, REDIS_PARAMS
@@ -17,7 +18,7 @@ def test_default_instance(faker: Faker) -> None:
     k = faker.name()
     v = faker.name()
     redis.set(k, v)
-    assert isinstance(redis, REDIS_CLS)
+    assert isinstance(redis, load_object(REDIS_CLS))
     assert redis.get(k) == v.encode()
 
 
@@ -34,16 +35,16 @@ def test_custom_class(faker: Faker, mocker: MockerFixture) -> None:
 def test_default_instance_from_settings() -> None:
     """Test default instance from settings."""
     redis = get_redis_from_settings(Settings())
-    assert isinstance(redis, REDIS_CLS)
+    assert isinstance(redis, load_object(REDIS_CLS))
 
 
 def test_custom_class_from_settings() -> None:
     """Test custom class from settings."""
     settings = Settings({
-        "REDIS_CLS": f"{REDIS_CLS.__module__}.{REDIS_CLS.__name__}",
+        "REDIS_CLS": REDIS_CLS,
     })
     redis = get_redis_from_settings(settings)
-    assert isinstance(redis, REDIS_CLS)
+    assert isinstance(redis, load_object(REDIS_CLS))
 
 
 def test_params_from_settings(faker: Faker, mocker: MockerFixture) -> None:

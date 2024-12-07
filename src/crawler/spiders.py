@@ -11,25 +11,13 @@ from typing import Any
 import scrapy
 from scrapy.http.response import Response
 from sqlalchemy import select
-from sqlalchemy.dialects.sqlite import INTEGER, VARCHAR
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlmodel import Column, Field, SQLModel
+from sqlmodel import SQLModel
 
+from crawler.congfig import LOG_FORMAT, NAME, REDIS_CLS, TWISTED_REACTOR
 from crawler.framework.scrapy.PowerfulSpider import PowerfulSpider
-
-
-class Target(SQLModel, table=True):
-    """target."""
-
-    id: int = Field(None, sa_column=Column(INTEGER(), primary_key=True))
-    url: str = Field(None, sa_column=Column(VARCHAR()))
-
-
-class Result(scrapy.Item):
-    """result."""
-
-    author = scrapy.Field()
-    text = scrapy.Field()
+from crawler.models.Result import Result
+from crawler.models.Target import Target
 
 
 async def parse(obj: scrapy.Spider, response: Response) -> AsyncGenerator[Any, None]:
@@ -51,10 +39,32 @@ async def process_item(obj: object, item: Result, spider: scrapy.Spider) -> Resu
     return item
 
 
+g = globals()
+spider_name = f"{NAME}Spider"
+pipeliner_name = f"{NAME}Pipeline"
+g.setdefault(
+    spider_name,
+    type(
+        spider_name,
+        (PowerfulSpider,),
+        {
+            "name": NAME,
+            "custom_settings": {
+                "LOG_FORMAT": LOG_FORMAT,
+                "ITEM_PIPELINES": {f"crawler.spiders.{pipeliner_name}": 1},
+                "TWISTED_REACTOR": TWISTED_REACTOR,
+                "REDIS_CLS": REDIS_CLS,
+            },
+            "parse": parse,
+        },
+    ),
+)
+g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": process_item}))
+
+
 async def init() -> None:
     """Init."""
     targets: list[Target] = []
-    g = globals()
     engine = create_async_engine("sqlite+aiosqlite://", echo=True)
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.drop_all)
@@ -67,27 +77,6 @@ async def init() -> None:
         result = await session.execute(stmt)
         targets = list(result.scalars())
     await engine.dispose()
-    name = "Quotes"
-    spider_name = f"{name}Spider"
-    pipeliner_name = f"{name}Pipeline"
-    g.setdefault(
-        spider_name,
-        type(
-            spider_name,
-            (PowerfulSpider,),
-            {
-                "name": name,
-                "custom_settings": {
-                    "LOG_FORMAT": "%(asctime)s.%(msecs)03d | %(levelname)-8s | "
-                    "%(name)s.%(module)s:%(funcName)s:%(lineno)d - %(message)s",
-                    "ITEM_PIPELINES": {f"crawler.spiders.{pipeliner_name}": 1},
-                    "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
-                },
-                "parse": parse,
-            },
-        ),
-    )
-    g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": process_item}))
 
     def wrapper(func: type) -> Callable[[Any], None]:
         def w(s: PowerfulSpider, *args: Any, **kwargs: Any) -> None:

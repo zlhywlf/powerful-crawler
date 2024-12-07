@@ -9,6 +9,7 @@ import os
 from scrapy.cmdline import execute
 from scrapy.utils.project import ENVVAR, get_project_settings
 
+from crawler.congfig import NAME
 from crawler.spiders import init
 
 
@@ -18,7 +19,7 @@ def main() -> None:
     os.environ.setdefault(ENVVAR, __name__)
     settings = get_project_settings()
     settings.setdict({"SPIDER_MODULES": "crawler.spiders"}, priority="project")
-    execute(["scrapy", "crawl", "Quotes"], settings)
+    execute(["scrapy", "crawl", NAME], settings)
 
 
 if __name__ == "__main__":

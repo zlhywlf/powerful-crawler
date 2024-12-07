@@ -17,11 +17,9 @@ SETTINGS_PARAMS_MAP = {
 }
 
 
-def get_redis(
-    *, url: str = "redis://localhost", redis_cls: type[QueueClient] | None = None, **kwargs: Any
-) -> QueueClient:
+def get_redis(*, redis_cls: str = REDIS_CLS, url: str = "redis://localhost", **kwargs: Any) -> QueueClient:
     """Get redis client."""
-    return redis_cls.from_url(url=url, **kwargs) if redis_cls else REDIS_CLS.from_url(url, **kwargs)
+    return load_object(redis_cls).from_url(url=url, **kwargs)  # type: ignore [no-any-return]
 
 
 def get_redis_from_settings(settings: BaseSettings) -> QueueClient:
@@ -31,6 +29,4 @@ def get_redis_from_settings(settings: BaseSettings) -> QueueClient:
         val = settings.get(source)
         if val:
             params[dest] = val
-    if isinstance(params.get("redis_cls"), str):
-        params["redis_cls"] = load_object(params["redis_cls"])
     return get_redis(**params)
