@@ -3,7 +3,8 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
-from collections.abc import Generator
+import json
+from collections.abc import Callable, Generator
 from typing import Any
 
 import scrapy
@@ -13,6 +14,8 @@ from sqlalchemy.dialects.sqlite import INTEGER, VARCHAR
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import selectinload
 from sqlmodel import Column, Field, ForeignKey, Relationship, SQLModel
+
+from crawler.framework.scrapy.PowerfulSpider import PowerfulSpider
 
 
 class Spider(SQLModel, table=True):
@@ -92,7 +95,7 @@ async def init() -> None:
             spider_name,
             type(
                 spider_name,
-                (scrapy.Spider,),
+                (PowerfulSpider,),
                 {
                     "name": name,
                     "custom_settings": {
@@ -107,3 +110,19 @@ async def init() -> None:
             ),
         )
         g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": process_item_func}))
+
+        def wrapper(func: type) -> Callable[[Any], None]:
+            def w(s: PowerfulSpider, *args: Any, **kwargs: Any) -> None:
+                func(s, *args, **kwargs)
+                client = s._client
+                client.execute_command(
+                    "ZADD",
+                    "powerful_spider",
+                    1,
+                    json.dumps({"url": "https://quotes.toscrape.com/tag/humor/", "method": "GET", "meta": {"a": 1}}),
+                )
+
+            return w
+
+        cls = g.get(spider_name)
+        cls.__init__ = wrapper(cls.__init__)  # type:ignore  [misc]
