@@ -15,17 +15,17 @@ class PriorityQueue(BaseQueue):
 
     @override
     def __len__(self) -> int:
-        return self.redis.zcard(self.key)
+        return self.client.zcard(self.key)
 
     @override
     def push(self, request: Request) -> None:
         data = self.encode_request(request)
         score = -request.priority
-        self.redis.execute_command("ZADD", self.key, score, data)
+        self.client.execute_command("ZADD", self.key, score, data)
 
     @override
     def pop(self, timeout: int = 0) -> Request | None:
-        pip = self.redis.pipeline()
+        pip = self.client.pipeline()
         pip.multi()
         pip.zrange(self.key, 0, 0)
         pip.zremrangebyrank(self.key, 0, 0)

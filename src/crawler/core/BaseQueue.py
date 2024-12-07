@@ -16,10 +16,10 @@ from crawler.core.QueueClient import QueueClient
 class BaseQueue(ABC):
     """base queue."""
 
-    def __init__(self, redis: QueueClient, spider: Spider, key: str) -> None:
+    def __init__(self, client: QueueClient, spider: Spider, key: str) -> None:
         """Init."""
         self._type_adapter = TypeAdapter(dict[str, Any])
-        self._redis = redis
+        self._client = client
         self._spider = spider
         self._key = key % {"spider": spider.name}
 
@@ -47,12 +47,12 @@ class BaseQueue(ABC):
 
     def clear(self) -> None:
         """Clear."""
-        self._redis.delete(self._key)
+        self._client.delete(self._key)
 
     @property
-    def redis(self) -> QueueClient:
-        """Redis."""
-        return self._redis
+    def client(self) -> QueueClient:
+        """Client."""
+        return self._client
 
     @property
     def key(self) -> str:

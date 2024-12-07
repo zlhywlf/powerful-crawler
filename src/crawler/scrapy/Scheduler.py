@@ -85,7 +85,7 @@ class Scheduler(BaseScheduler):
     @override
     def open(self, spider: Spider) -> Deferred[None] | None:
         self._spider = spider
-        self._queue = load_object(self._queue_cls)(redis=self._redis, spider=spider, key=self._queue_key)
+        self._queue = load_object(self._queue_cls)(client=self._redis, spider=spider, key=self._queue_key)
         if self._flush_on_start:
             self.flush()
         if len(self.queue):
