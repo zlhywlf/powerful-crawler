@@ -21,9 +21,9 @@ from crawler.congfig import (
     SCHEDULER_QUEUE_CLASS,
     SCHEDULER_QUEUE_KEY,
 )
-from crawler.core.queues.BaseQueue import BaseQueue
+from crawler.core.BaseQueue import BaseQueue
 from crawler.core.RedisClient import RedisClient
-from crawler.core.RFPDupeFilter import RFPDupeFilter
+from crawler.scrapy.RFPDupeFilter import RFPDupeFilter
 
 
 class Scheduler(BaseScheduler):

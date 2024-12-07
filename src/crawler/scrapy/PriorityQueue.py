@@ -7,7 +7,7 @@ from typing import override
 
 from scrapy import Request
 
-from crawler.core.queues.BaseQueue import BaseQueue
+from crawler.core.BaseQueue import BaseQueue
 
 
 class PriorityQueue(BaseQueue):

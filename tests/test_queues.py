@@ -8,9 +8,9 @@ from faker import Faker
 from scrapy import Request, Spider
 
 from crawler.clients.FakeRedisClient import FakeRedisClient
-from crawler.core.queues.BaseQueue import BaseQueue
-from crawler.core.queues.PriorityQueue import PriorityQueue
+from crawler.core.BaseQueue import BaseQueue
 from crawler.core.RedisClient import RedisClient
+from crawler.scrapy.PriorityQueue import PriorityQueue
 
 
 @pytest.fixture
