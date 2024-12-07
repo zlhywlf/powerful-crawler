@@ -13,7 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel
 
-from crawler.congfig import LOG_FORMAT, NAME, REDIS_CLS, TWISTED_REACTOR
+from crawler.congfig import LOG_FORMAT, NAME, REDIS_CLS
 from crawler.frameworks.scrapy.PowerfulSpider import PowerfulSpider
 from crawler.models.Target import Target
 from crawler.pasers.MasterPaser import MasterPaser
@@ -32,7 +32,7 @@ g.setdefault(
             "custom_settings": {
                 "LOG_FORMAT": LOG_FORMAT,
                 "ITEM_PIPELINES": {f"crawler.frameworks.scrapy.spider.{pipeliner_name}": 1},
-                "TWISTED_REACTOR": TWISTED_REACTOR,
+                "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
                 "REDIS_CLS": REDIS_CLS,
             },
             "parse": MasterPaser(),
