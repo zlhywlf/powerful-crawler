@@ -64,7 +64,7 @@ def process_item(obj: object, item: SpiderItem, spider: scrapy.Spider) -> Spider
 async def init() -> None:
     """Init."""
     db = Path(os.environ["USERPROFILE"]) / "Projects" / "public" / "laboratory" / "identifier.sqlite"
-    _configs: list[Spider] = []
+    configs: list[Spider] = []
     g = globals()
     engine = create_async_engine(f"sqlite+aiosqlite:///{db}", echo=True)
     async with engine.begin() as conn:
@@ -83,9 +83,9 @@ async def init() -> None:
             ])
         stmt = select(Spider).options(selectinload(Spider.start_urls))  # type:ignore  [arg-type]
         result = await session.execute(stmt)
-        _configs = list(result.scalars())
+        configs = list(result.scalars())
     await engine.dispose()
-    for config in _configs:
+    for config in configs:
         name = config.name
         spider_name = f"{name}Spider"
         pipeliner_name = f"{name}Pipeline"
