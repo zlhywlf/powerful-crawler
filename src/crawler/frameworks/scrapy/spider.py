@@ -31,7 +31,7 @@ g.setdefault(
             "name": NAME,
             "custom_settings": {
                 "LOG_FORMAT": LOG_FORMAT,
-                "ITEM_PIPELINES": {f"crawler.spiders.{pipeliner_name}": 1},
+                "ITEM_PIPELINES": {f"crawler.frameworks.scrapy.spider.{pipeliner_name}": 1},
                 "TWISTED_REACTOR": TWISTED_REACTOR,
                 "REDIS_CLS": REDIS_CLS,
             },

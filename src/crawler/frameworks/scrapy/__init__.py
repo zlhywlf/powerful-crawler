@@ -7,8 +7,8 @@ from crawler.congfig import NAME
 
 
 def main() -> None:
-    """The powerful crawler application."""
+    """Scrapy."""
     os.environ.setdefault(ENVVAR, __name__)
     settings = get_project_settings()
-    settings.setdict({"SPIDER_MODULES": "crawler.spiders"}, priority="project")
+    settings.setdict({"SPIDER_MODULES": "crawler.frameworks.scrapy.spider"}, priority="project")
     execute(["scrapy", "crawl", NAME], settings)
