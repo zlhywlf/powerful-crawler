@@ -18,15 +18,15 @@ from sqlmodel import Column, Field, SQLModel
 from crawler.framework.scrapy.PowerfulSpider import PowerfulSpider
 
 
-class Url(SQLModel, table=True):
-    """url."""
+class Target(SQLModel, table=True):
+    """target."""
 
     id: int = Field(None, sa_column=Column(INTEGER(), primary_key=True))
     url: str = Field(None, sa_column=Column(VARCHAR()))
 
 
-class SpiderItem(scrapy.Item):
-    """model."""
+class Result(scrapy.Item):
+    """result."""
 
     author = scrapy.Field()
     text = scrapy.Field()
@@ -35,7 +35,7 @@ class SpiderItem(scrapy.Item):
 async def parse(obj: scrapy.Spider, response: Response) -> AsyncGenerator[Any, None]:
     """Parse."""
     for quote in response.css("div.quote"):
-        yield SpiderItem(
+        yield Result(
             author=quote.xpath("span/small/text()").get(),
             text=quote.css("span.text::text").get(),
         )
@@ -45,7 +45,7 @@ async def parse(obj: scrapy.Spider, response: Response) -> AsyncGenerator[Any, N
         yield response.follow(next_page, obj.parse)
 
 
-async def process_item(obj: object, item: SpiderItem, spider: scrapy.Spider) -> SpiderItem:  # noqa: ARG001
+async def process_item(obj: object, item: Result, spider: scrapy.Spider) -> Result:  # noqa: ARG001
     """Process item."""
     spider.log(item)
     return item
@@ -53,7 +53,7 @@ async def process_item(obj: object, item: SpiderItem, spider: scrapy.Spider) -> 
 
 async def init() -> None:
     """Init."""
-    configs: list[Url] = []
+    targets: list[Target] = []
     g = globals()
     engine = create_async_engine("sqlite+aiosqlite://", echo=True)
     async with engine.begin() as conn:
@@ -62,10 +62,10 @@ async def init() -> None:
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         async with session.begin():
-            session.add_all([Url(url="https://quotes.toscrape.com/tag/humor/")])
-        stmt = select(Url)
+            session.add_all([Target(url="https://quotes.toscrape.com/tag/humor/")])
+        stmt = select(Target)
         result = await session.execute(stmt)
-        configs = list(result.scalars())
+        targets = list(result.scalars())
     await engine.dispose()
     name = "Quotes"
     spider_name = f"{name}Spider"
@@ -105,7 +105,7 @@ async def init() -> None:
                             "meta": {"a": 1},
                         }),
                     )
-                    for _ in configs
+                    for _ in targets
                 ],
             ).start()
             threading.Timer(
