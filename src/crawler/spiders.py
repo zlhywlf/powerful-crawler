@@ -105,7 +105,6 @@ async def init() -> None:
                         "ITEM_PIPELINES": {f"crawler.spiders.{pipeliner_name}": 1},
                         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
                     },
-                    "start_urls": [_.url for _ in config.start_urls],
                     "parse": parse_func,
                 },
             ),
@@ -117,16 +116,19 @@ async def init() -> None:
                 func(s, *args, **kwargs)
                 threading.Timer(
                     2,
-                    lambda: s._client.execute_command(
-                        "ZADD",
-                        "powerful_spider",
-                        1,
-                        json.dumps({
-                            "url": "https://quotes.toscrape.com/tag/humor/",
-                            "method": "GET",
-                            "meta": {"a": 1},
-                        }),
-                    ),
+                    lambda: [
+                        s._client.execute_command(
+                            "ZADD",
+                            "powerful_spider",
+                            1,
+                            json.dumps({
+                                "url": _.url,
+                                "method": "GET",
+                                "meta": {"a": 1},
+                            }),
+                        )
+                        for _ in config.start_urls  # noqa: B023
+                    ],
                 ).start()
                 threading.Timer(
                     2,
