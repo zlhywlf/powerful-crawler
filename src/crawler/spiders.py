@@ -6,39 +6,18 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 import asyncio
 import json
 import threading
-from collections.abc import AsyncGenerator, Callable
+from collections.abc import Callable
 from typing import Any
 
-import scrapy
-from scrapy.http.response import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel
 
 from crawler.congfig import LOG_FORMAT, NAME, REDIS_CLS, TWISTED_REACTOR
 from crawler.frameworks.scrapy.PowerfulSpider import PowerfulSpider
-from crawler.models.Result import Result
 from crawler.models.Target import Target
-
-
-async def parse(obj: scrapy.Spider, response: Response) -> AsyncGenerator[Any, None]:
-    """Parse."""
-    for quote in response.css("div.quote"):
-        yield Result(
-            author=quote.xpath("span/small/text()").get(),
-            text=quote.css("span.text::text").get(),
-        )
-
-    next_page = response.css('li.next a::attr("href")').get()
-    if next_page is not None:
-        yield response.follow(next_page, obj.parse)
-
-
-async def process_item(obj: object, item: Result, spider: scrapy.Spider) -> Result:  # noqa: ARG001
-    """Process item."""
-    spider.log(item)
-    return item
-
+from crawler.pasers.MasterPaser import MasterPaser
+from crawler.processors.MasterProcessor import MasterProcessor
 
 g = globals()
 spider_name = f"{NAME}Spider"
@@ -56,11 +35,11 @@ g.setdefault(
                 "TWISTED_REACTOR": TWISTED_REACTOR,
                 "REDIS_CLS": REDIS_CLS,
             },
-            "parse": parse,
+            "parse": MasterPaser(),
         },
     ),
 )
-g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": process_item}))
+g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": MasterProcessor()}))
 
 
 async def init() -> None:
