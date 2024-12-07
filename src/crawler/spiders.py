@@ -13,27 +13,15 @@ from scrapy.http.response import Response
 from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import INTEGER, VARCHAR
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.orm import selectinload
-from sqlmodel import Column, Field, ForeignKey, Relationship, SQLModel
+from sqlmodel import Column, Field, SQLModel
 
 from crawler.framework.scrapy.PowerfulSpider import PowerfulSpider
-
-
-class Spider(SQLModel, table=True):
-    """Spider."""
-
-    id: int = Field(None, sa_column=Column(INTEGER(), primary_key=True))
-    name: str = Field(None, sa_column=Column(VARCHAR()))
-    parse: str = Field(None, sa_column=Column(VARCHAR()))
-    process_item: str = Field(None, sa_column=Column(VARCHAR()))
-    start_urls: list["Url"] = Relationship()
 
 
 class Url(SQLModel, table=True):
     """url."""
 
     id: int = Field(None, sa_column=Column(INTEGER(), primary_key=True))
-    spider_id: int = Field(None, sa_column=Column(INTEGER(), ForeignKey("spider.id")))
     url: str = Field(None, sa_column=Column(VARCHAR()))
 
 
@@ -65,7 +53,7 @@ async def process_item(obj: object, item: SpiderItem, spider: scrapy.Spider) -> 
 
 async def init() -> None:
     """Init."""
-    configs: list[Spider] = []
+    configs: list[Url] = []
     g = globals()
     engine = create_async_engine("sqlite+aiosqlite://", echo=True)
     async with engine.begin() as conn:
@@ -74,68 +62,58 @@ async def init() -> None:
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         async with session.begin():
-            session.add_all([
-                Spider(
-                    name="Quotes",
-                    parse="parse",
-                    process_item="process_item",
-                    start_urls=[Url(spider_id=1, url="https://quotes.toscrape.com/tag/humor/")],
-                )
-            ])
-        stmt = select(Spider).options(selectinload(Spider.start_urls))  # type:ignore  [arg-type]
+            session.add_all([Url(url="https://quotes.toscrape.com/tag/humor/")])
+        stmt = select(Url)
         result = await session.execute(stmt)
         configs = list(result.scalars())
     await engine.dispose()
-    for config in configs:
-        name = config.name
-        spider_name = f"{name}Spider"
-        pipeliner_name = f"{name}Pipeline"
-        parse_func = g[config.parse]
-        process_item_func = g[config.process_item]
-        g.setdefault(
+    name = "Quotes"
+    spider_name = f"{name}Spider"
+    pipeliner_name = f"{name}Pipeline"
+    g.setdefault(
+        spider_name,
+        type(
             spider_name,
-            type(
-                spider_name,
-                (PowerfulSpider,),
-                {
-                    "name": name,
-                    "custom_settings": {
-                        "LOG_FORMAT": "%(asctime)s.%(msecs)03d | %(levelname)-8s | "
-                        "%(name)s.%(module)s:%(funcName)s:%(lineno)d - %(message)s",
-                        "ITEM_PIPELINES": {f"crawler.spiders.{pipeliner_name}": 1},
-                        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
-                    },
-                    "parse": parse_func,
+            (PowerfulSpider,),
+            {
+                "name": name,
+                "custom_settings": {
+                    "LOG_FORMAT": "%(asctime)s.%(msecs)03d | %(levelname)-8s | "
+                    "%(name)s.%(module)s:%(funcName)s:%(lineno)d - %(message)s",
+                    "ITEM_PIPELINES": {f"crawler.spiders.{pipeliner_name}": 1},
+                    "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
                 },
-            ),
-        )
-        g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": process_item_func}))
+                "parse": parse,
+            },
+        ),
+    )
+    g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": process_item}))
 
-        def wrapper(func: type) -> Callable[[Any], None]:
-            def w(s: PowerfulSpider, *args: Any, **kwargs: Any) -> None:
-                func(s, *args, **kwargs)
-                threading.Timer(
-                    2,
-                    lambda: [
-                        s._client.execute_command(
-                            "ZADD",
-                            "powerful_spider",
-                            1,
-                            json.dumps({
-                                "url": _.url,
-                                "method": "GET",
-                                "meta": {"a": 1},
-                            }),
-                        )
-                        for _ in config.start_urls  # noqa: B023
-                    ],
-                ).start()
-                threading.Timer(
-                    2,
-                    lambda: setattr(s, "_max_idle_time", 1),
-                ).start()
+    def wrapper(func: type) -> Callable[[Any], None]:
+        def w(s: PowerfulSpider, *args: Any, **kwargs: Any) -> None:
+            func(s, *args, **kwargs)
+            threading.Timer(
+                2,
+                lambda: [
+                    s._client.execute_command(
+                        "ZADD",
+                        "powerful_spider",
+                        1,
+                        json.dumps({
+                            "url": _.url,
+                            "method": "GET",
+                            "meta": {"a": 1},
+                        }),
+                    )
+                    for _ in configs
+                ],
+            ).start()
+            threading.Timer(
+                2,
+                lambda: setattr(s, "_max_idle_time", 1),
+            ).start()
 
-            return w
+        return w
 
-        cls = g.get(spider_name)
-        cls.__init__ = wrapper(cls.__init__)  # type:ignore  [misc]
+    cls = g.get(spider_name)
+    cls.__init__ = wrapper(cls.__init__)  # type:ignore  [misc]
