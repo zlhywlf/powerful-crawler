@@ -55,5 +55,5 @@ class FakeRedisClient(QueueClient):
             pip.multi()
             pip.zrevrange(key, start, end)
             pip.zremrangebyrank(key, min_, max_)
-            results: list[Any] = pip.execute()[0]
+            results: list[Any] = pip.execute()[0]  # type:ignore  [no-untyped-call]
         return results

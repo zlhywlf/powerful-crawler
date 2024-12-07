@@ -17,7 +17,7 @@ REDIS_PARAMS = {
 DUPE_FILTER_KEY = "dupe_filter:%(timestamp)s"
 
 SCHEDULER_QUEUE_KEY = "%(spider)s:requests"
-SCHEDULER_QUEUE_CLASS = "crawler.scrapy.PriorityQueue.PriorityQueue"
+SCHEDULER_QUEUE_CLASS = "crawler.framework.scrapy.PriorityQueue.PriorityQueue"
 
 SCHEDULER_DUPE_FILTER_KEY = "%(spider)s:dupe_filter"
-SCHEDULER_DUPE_FILTER_CLASS = "crawler.scrapy.RFPDupeFilter.RFPDupeFilter"
+SCHEDULER_DUPE_FILTER_CLASS = "crawler.framework.scrapy.RFPDupeFilter.RFPDupeFilter"

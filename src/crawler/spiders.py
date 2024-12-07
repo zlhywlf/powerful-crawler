@@ -3,9 +3,7 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
-import os
 from collections.abc import Generator
-from pathlib import Path
 from typing import Any
 
 import scrapy
@@ -63,10 +61,9 @@ def process_item(obj: object, item: SpiderItem, spider: scrapy.Spider) -> Spider
 
 async def init() -> None:
     """Init."""
-    db = Path(os.environ["USERPROFILE"]) / "Projects" / "public" / "laboratory" / "identifier.sqlite"
     configs: list[Spider] = []
     g = globals()
-    engine = create_async_engine(f"sqlite+aiosqlite:///{db}", echo=True)
+    engine = create_async_engine("sqlite+aiosqlite://", echo=True)
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.drop_all)
         await conn.run_sync(SQLModel.metadata.create_all)

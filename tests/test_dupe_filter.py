@@ -9,7 +9,7 @@ from pytest_mock import MockerFixture, MockType
 from scrapy import Request
 from scrapy.settings import Settings
 
-from crawler.scrapy.RFPDupeFilter import DUPE_FILTER_KEY, RFPDupeFilter  # type:ignore [attr-defined]
+from crawler.framework.scrapy.RFPDupeFilter import DUPE_FILTER_KEY, RFPDupeFilter  # type:ignore [attr-defined]
 
 
 @pytest.fixture

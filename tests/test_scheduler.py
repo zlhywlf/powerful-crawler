@@ -10,7 +10,7 @@ from scrapy import Request
 from scrapy.crawler import Crawler
 from scrapy.utils.test import get_crawler
 
-from crawler.scrapy.Scheduler import Scheduler
+from crawler.framework.scrapy.Scheduler import Scheduler
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def crawler(faker: Faker) -> Crawler:
             "SCHEDULER_DUPE_FILTER_KEY": faker.user_name(),
             "SCHEDULER_FLUSH_ON_START": False,
             "SCHEDULER_PERSIST": False,
-            "DUPEFILTER_CLASS": "crawler.scrapy.RFPDupeFilter.RFPDupeFilter",
+            "DUPEFILTER_CLASS": "crawler.framework.scrapy.RFPDupeFilter.RFPDupeFilter",
         }
     )
 
