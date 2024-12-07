@@ -25,7 +25,7 @@ class PowerfulSpider(Spider):
         super().__init__(*args, **kwargs)
         self._key = "powerful_spider"
         self._batch_size = 32
-        self._max_idle_time = 1
+        self._max_idle_time = 0
         self._client = client
         self._type_adapter = TypeAdapter(dict[str, Any])
         self._idle_start_time = 0

@@ -4,6 +4,7 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
 import json
+import threading
 from collections.abc import Callable, Generator
 from typing import Any
 
@@ -114,13 +115,23 @@ async def init() -> None:
         def wrapper(func: type) -> Callable[[Any], None]:
             def w(s: PowerfulSpider, *args: Any, **kwargs: Any) -> None:
                 func(s, *args, **kwargs)
-                client = s._client
-                client.execute_command(
-                    "ZADD",
-                    "powerful_spider",
-                    1,
-                    json.dumps({"url": "https://quotes.toscrape.com/tag/humor/", "method": "GET", "meta": {"a": 1}}),
-                )
+                threading.Timer(
+                    2,
+                    lambda: s._client.execute_command(
+                        "ZADD",
+                        "powerful_spider",
+                        1,
+                        json.dumps({
+                            "url": "https://quotes.toscrape.com/tag/humor/",
+                            "method": "GET",
+                            "meta": {"a": 1},
+                        }),
+                    ),
+                ).start()
+                threading.Timer(
+                    2,
+                    lambda: setattr(s, "_max_idle_time", 1),
+                ).start()
 
             return w
 
