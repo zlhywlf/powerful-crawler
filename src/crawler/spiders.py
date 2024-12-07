@@ -5,7 +5,7 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 
 import json
 import threading
-from collections.abc import Callable, Generator
+from collections.abc import AsyncGenerator, Callable
 from typing import Any
 
 import scrapy
@@ -44,7 +44,7 @@ class SpiderItem(scrapy.Item):
     text = scrapy.Field()
 
 
-def parse(obj: scrapy.Spider, response: Response) -> Generator[Any, Any, None]:
+async def parse(obj: scrapy.Spider, response: Response) -> AsyncGenerator[Any, None]:
     """Parse."""
     for quote in response.css("div.quote"):
         yield SpiderItem(
@@ -57,7 +57,7 @@ def parse(obj: scrapy.Spider, response: Response) -> Generator[Any, Any, None]:
         yield response.follow(next_page, obj.parse)
 
 
-def process_item(obj: object, item: SpiderItem, spider: scrapy.Spider) -> SpiderItem:  # noqa: ARG001
+async def process_item(obj: object, item: SpiderItem, spider: scrapy.Spider) -> SpiderItem:  # noqa: ARG001
     """Process item."""
     spider.log(item)
     return item
