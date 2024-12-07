@@ -18,7 +18,7 @@ from w3lib.url import canonicalize_url
 
 from crawler.clients import get_redis_from_settings
 from crawler.congfig import DUPE_FILTER_KEY
-from crawler.core.RedisClient import RedisClient
+from crawler.core.QueueClient import QueueClient
 
 
 class RFPDupeFilter(BaseDupeFilter):
@@ -26,7 +26,7 @@ class RFPDupeFilter(BaseDupeFilter):
 
     logger = logging.getLogger(__name__)
 
-    def __init__(self, *, redis: RedisClient, key: str, debug: bool = False) -> None:
+    def __init__(self, *, redis: QueueClient, key: str, debug: bool = False) -> None:
         """Init."""
         self._redis = redis
         self._debug = debug
@@ -73,7 +73,7 @@ class RFPDupeFilter(BaseDupeFilter):
             self.logger.debug(f"Filtered duplicate request: {request}", extra={"spider": spider})
 
     @property
-    def redis(self) -> RedisClient:
+    def redis(self) -> QueueClient:
         """Redis."""
         return self._redis
 

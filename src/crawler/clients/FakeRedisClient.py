@@ -8,10 +8,10 @@ from typing import Any, Self, override
 from fakeredis import FakeStrictRedis
 from redis.client import Pipeline
 
-from crawler.core.RedisClient import RedisClient
+from crawler.core.QueueClient import QueueClient
 
 
-class FakeRedisClient(RedisClient):
+class FakeRedisClient(QueueClient):
     """fake redis client."""
 
     def __init__(self, redis: FakeStrictRedis) -> None:

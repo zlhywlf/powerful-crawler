@@ -10,13 +10,13 @@ from pydantic import TypeAdapter
 from scrapy import Request, Spider
 from scrapy.utils.request import request_from_dict
 
-from crawler.core.RedisClient import RedisClient
+from crawler.core.QueueClient import QueueClient
 
 
 class BaseQueue(ABC):
     """base queue."""
 
-    def __init__(self, redis: RedisClient, spider: Spider, key: str) -> None:
+    def __init__(self, redis: QueueClient, spider: Spider, key: str) -> None:
         """Init."""
         self._type_adapter = TypeAdapter(dict[str, Any])
         self._redis = redis
@@ -50,7 +50,7 @@ class BaseQueue(ABC):
         self._redis.delete(self._key)
 
     @property
-    def redis(self) -> RedisClient:
+    def redis(self) -> QueueClient:
         """Redis."""
         return self._redis
 

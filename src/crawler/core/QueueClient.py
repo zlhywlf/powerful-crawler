@@ -9,8 +9,8 @@ from typing import Any, Self
 from redis.client import Pipeline
 
 
-class RedisClient(ABC):
-    """redis client."""
+class QueueClient(ABC):
+    """queue client."""
 
     @abstractmethod
     def set(self, name: str, value: str | float) -> None:

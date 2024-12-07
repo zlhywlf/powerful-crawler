@@ -22,7 +22,7 @@ from crawler.congfig import (
     SCHEDULER_QUEUE_KEY,
 )
 from crawler.core.BaseQueue import BaseQueue
-from crawler.core.RedisClient import RedisClient
+from crawler.core.QueueClient import QueueClient
 from crawler.scrapy.RFPDupeFilter import RFPDupeFilter
 
 
@@ -31,7 +31,7 @@ class Scheduler(BaseScheduler):
 
     def __init__(
         self,
-        redis: RedisClient,
+        redis: QueueClient,
         idle_before_close: int = 0,
         stats: StatsCollector | None = None,
         queue_key: str = SCHEDULER_QUEUE_KEY,

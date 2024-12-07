@@ -9,18 +9,18 @@ from scrapy import Request, Spider
 
 from crawler.clients.FakeRedisClient import FakeRedisClient
 from crawler.core.BaseQueue import BaseQueue
-from crawler.core.RedisClient import RedisClient
+from crawler.core.QueueClient import QueueClient
 from crawler.scrapy.PriorityQueue import PriorityQueue
 
 
 @pytest.fixture
-def redis(faker: Faker) -> RedisClient:
+def redis(faker: Faker) -> QueueClient:
     """Redis client."""
     return FakeRedisClient.from_url(faker.url())
 
 
 @pytest.mark.parametrize("q_cls", [PriorityQueue])
-def test_clear(redis: RedisClient, faker: Faker, q_cls: type[BaseQueue]) -> None:
+def test_clear(redis: QueueClient, faker: Faker, q_cls: type[BaseQueue]) -> None:
     """Test clear."""
     q = q_cls(redis, Spider(faker.name()), faker.name())
     assert len(q) == 0
@@ -33,7 +33,7 @@ def test_clear(redis: RedisClient, faker: Faker, q_cls: type[BaseQueue]) -> None
     assert len(q) == 0
 
 
-def test_priority_queue(redis: RedisClient, faker: Faker) -> None:
+def test_priority_queue(redis: QueueClient, faker: Faker) -> None:
     """Test priority queue."""
     q = PriorityQueue(redis, Spider(faker.name()), faker.name())
     req01 = Request(faker.unique.url(), priority=100)
@@ -54,7 +54,7 @@ def test_priority_queue(redis: RedisClient, faker: Faker) -> None:
 
 
 @pytest.mark.parametrize("q_cls", [PriorityQueue])
-def test_encode_decode_requests(redis: RedisClient, faker: Faker, q_cls: type[BaseQueue]) -> None:
+def test_encode_decode_requests(redis: QueueClient, faker: Faker, q_cls: type[BaseQueue]) -> None:
     """Test encode decode requests."""
     spider = Spider(faker.name())
     q = q_cls(redis, spider, faker.name())

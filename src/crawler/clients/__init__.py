@@ -4,7 +4,7 @@ from scrapy.settings import BaseSettings
 from scrapy.utils.misc import load_object
 
 from crawler.congfig import REDIS_CLS, REDIS_PARAMS
-from crawler.core.RedisClient import RedisClient
+from crawler.core.QueueClient import QueueClient
 
 SETTINGS_PARAMS_MAP = {
     "REDIS_URL": "url",
@@ -18,13 +18,13 @@ SETTINGS_PARAMS_MAP = {
 
 
 def get_redis(
-    *, url: str = "redis://localhost", redis_cls: type[RedisClient] | None = None, **kwargs: Any
-) -> RedisClient:
+    *, url: str = "redis://localhost", redis_cls: type[QueueClient] | None = None, **kwargs: Any
+) -> QueueClient:
     """Get redis client."""
     return redis_cls.from_url(url=url, **kwargs) if redis_cls else REDIS_CLS.from_url(url, **kwargs)
 
 
-def get_redis_from_settings(settings: BaseSettings) -> RedisClient:
+def get_redis_from_settings(settings: BaseSettings) -> QueueClient:
     """Get redis client from settings."""
     params = REDIS_PARAMS.copy() | settings.getdict("REDIS_PARAMS")
     for source, dest in SETTINGS_PARAMS_MAP.items():
