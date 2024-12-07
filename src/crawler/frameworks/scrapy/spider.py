@@ -52,7 +52,7 @@ async def init() -> None:
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         async with session.begin():
-            session.add_all([Target(url="https://quotes.toscrape.com/tag/humor/")])
+            session.add_all([Target(url="https://quotes.toscrape.com/tag/humor/", method="get")])
         stmt = select(Target)
         result = await session.execute(stmt)
         targets = list(result.scalars())
@@ -70,7 +70,7 @@ async def init() -> None:
                         1,
                         json.dumps({
                             "url": _.url,
-                            "method": "GET",
+                            "method": _.method,
                             "meta": {"a": 1},
                         }),
                     )

@@ -12,3 +12,4 @@ class Target(SQLModel, table=True):
 
     id: int = Field(None, sa_column=Column(INTEGER(), primary_key=True))
     url: str = Field(None, sa_column=Column(VARCHAR()))
+    method: str = Field(None, sa_column=Column(VARCHAR()))
