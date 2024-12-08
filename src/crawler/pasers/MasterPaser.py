@@ -8,7 +8,10 @@ from typing import Any
 
 from scrapy.http.response import Response
 
-from crawler.models.Result import Result
+from crawler.models.Context import Context
+from crawler.models.Meta import Meta
+from crawler.pasers.NextPageDecisionNode import NextPageDecisionNode
+from crawler.pasers.ParserDecisionEngine import ParserDecisionEngine
 
 
 class MasterPaser:
@@ -16,11 +19,9 @@ class MasterPaser:
 
     async def __call__(self, response: Response) -> AsyncGenerator[Any, None]:
         """Parse."""
-        for quote in response.css("div.quote"):
-            yield Result(
-                author=quote.xpath("span/small/text()").get(),
-                text=quote.css("span.text::text").get(),
-            )
-        next_page = response.css('li.next a::attr("href")').get()
-        if next_page is not None:
-            yield response.follow(next_page, self.__call__)  # type: ignore [arg-type]
+        engine = ParserDecisionEngine(
+            Meta(name="NextPageDecisionNode", type=-1), {"NextPageDecisionNode": NextPageDecisionNode()}
+        )
+        results = await engine.process(Context(url=response.url, meta=response.meta))
+        for result in results:
+            yield result

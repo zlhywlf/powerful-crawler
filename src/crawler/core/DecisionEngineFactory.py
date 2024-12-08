@@ -9,9 +9,9 @@ from crawler.core.DecisionEngine import DecisionEngine
 from crawler.models.Meta import Meta
 
 
-class DecisionEngineFactory[T](ABC):
+class DecisionEngineFactory(ABC):
     """decision engine factory."""
 
     @abstractmethod
-    def create_engine(self, meta: Meta) -> DecisionEngine[T]:
+    def create_engine(self, meta: Meta) -> DecisionEngine:
         """Create engine."""
