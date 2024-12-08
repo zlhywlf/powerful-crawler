@@ -42,7 +42,7 @@ g.setdefault(
 g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": MasterProcessor()}))
 
 
-async def init() -> None:
+async def init(data: dict[str, Any]) -> None:
     """Init."""
     targets: list[Target] = []
     engine = create_async_engine("sqlite+aiosqlite://", echo=True)
@@ -52,7 +52,8 @@ async def init() -> None:
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         async with session.begin():
-            session.add_all([Target(url="https://quotes.toscrape.com/tag/humor/", method="get")])
+            if "url" in data:
+                session.add_all([Target(url=data.pop("url"), method="get")])
         stmt = select(Target)
         result = await session.execute(stmt)
         targets = list(result.scalars())
@@ -71,34 +72,7 @@ async def init() -> None:
                         json.dumps({
                             "url": _.url,
                             "method": _.method,
-                            "meta": {
-                                "decision": {
-                                    "name": "NextPageDecisionNode",
-                                    "type": -1,
-                                    "meta": [
-                                        {
-                                            "name": "NextPageDecisionNode",
-                                            "type": -1,
-                                            "meta": [
-                                                {
-                                                    "name": "SavePageDecisionNode",
-                                                    "type": 0,
-                                                    "meta": None,
-                                                    "config": None,
-                                                },
-                                            ],
-                                            "config": None,
-                                        },
-                                        {
-                                            "name": "SavePageDecisionNode",
-                                            "type": -1,
-                                            "meta": None,
-                                            "config": None,
-                                        },
-                                    ],
-                                    "config": {"needed": True, "next": 'li.next a::attr("href")', "type": "css"},
-                                }
-                            },
+                            "meta": {"decision": data, "file_name": "start_page"},
                         }),
                     )
                     for _ in targets
@@ -115,4 +89,94 @@ async def init() -> None:
     cls.__init__ = wrapper(cls.__init__)  # type:ignore  [misc]
 
 
-asyncio.run(init())
+simple = {
+    "url": "https://quotes.toscrape.com/tag/humor/",
+    "name": "NextPageDecisionNode",
+    "type": -1,
+    "meta": [
+        {
+            "name": "NextPageDecisionNode",
+            "type": -1,
+            "meta": [
+                {
+                    "name": "SavePageDecisionNode",
+                    "type": 0,
+                    "meta": None,
+                    "config": None,
+                },
+            ],
+            "config": None,
+        },
+        {
+            "name": "SavePageDecisionNode",
+            "type": -1,
+            "meta": None,
+            "config": None,
+        },
+    ],
+    "config": {"needed": True, "next": 'li.next a::attr("href")', "type": "css"},
+}
+
+deep = {
+    "url": "https://www.hbggzypm.cn//jynoticeController/tojynoticelist",
+    "name": "PagingDecisionNode",
+    "type": -1,
+    "meta": [
+        {
+            "name": "PagingDecisionNode",
+            "type": -1,
+            "meta": [
+                {
+                    "name": "SavePageDecisionNode",
+                    "type": 0,
+                    "meta": None,
+                    "config": None,
+                },
+            ],
+            "config": None,
+        },
+        {
+            "name": "SavePageDecisionNode",
+            "type": -1,
+            "meta": None,
+            "config": None,
+        },
+    ],
+    "config": {
+        "needed": False,
+        "limit": r"var\s+limitcount\s*=\s*(\d+)",
+        "count": r'count\s*:\s*["\']?(\d+)["\']?,',
+        "url": r'url\s*:\s*[\'"]([^\'"]+)[\'"]',
+        "next": {
+            "name": "ListPageDecisionNode",
+            "type": -1,
+            "meta": [
+                {
+                    "name": "ListPageDecisionNode",
+                    "type": -1,
+                    "meta": None,
+                    "config": None,
+                },
+            ],
+            "config": {
+                "paths": "//tr//a[@title]/@href",
+                "names": "//tr//a/@title",
+                "next": {
+                    "name": "SavePageDecisionNode",
+                    "type": -1,
+                    "meta": [
+                        {
+                            "name": "SavePageDecisionNode",
+                            "type": -1,
+                            "meta": None,
+                            "config": None,
+                        },
+                    ],
+                    "config": None,
+                },
+            },
+        },
+    },
+}
+
+asyncio.run(init(deep))

@@ -20,7 +20,12 @@ class SavePageDecisionNode(DecisionNode):
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
         results: list[Result | Request] = [
-            Result(id=99, type=ctx.response.headers.get("Content-Type", "unknown"), content=ctx.response.body)
+            Result(
+                id=99,
+                type=ctx.response.headers.get("Content-Type", "unknown"),
+                content=ctx.response.body,
+                name=ctx.response.meta.get("file_name", ""),
+            )
         ]
         if ctx.checker:
             results.extend(ctx.checker.result or [])

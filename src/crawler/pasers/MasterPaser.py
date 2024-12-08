@@ -10,7 +10,9 @@ from scrapy.http.response import Response
 
 from crawler.models.Context import Context
 from crawler.models.Meta import Meta
+from crawler.pasers.ListPageDecisionNode import ListPageDecisionNode
 from crawler.pasers.NextPageDecisionNode import NextPageDecisionNode
+from crawler.pasers.PagingDecisionNode import PagingDecisionNode
 from crawler.pasers.ParserDecisionEngine import ParserDecisionEngine
 from crawler.pasers.SavePageDecisionNode import SavePageDecisionNode
 
@@ -22,7 +24,12 @@ class MasterPaser:
         """Parse."""
         engine = ParserDecisionEngine(
             Meta.model_validate(response.meta.get("decision")),
-            {"NextPageDecisionNode": NextPageDecisionNode(), "SavePageDecisionNode": SavePageDecisionNode()},
+            {
+                "NextPageDecisionNode": NextPageDecisionNode(),
+                "SavePageDecisionNode": SavePageDecisionNode(),
+                "PagingDecisionNode": PagingDecisionNode(),
+                "ListPageDecisionNode": ListPageDecisionNode(),
+            },
         )
         results = await engine.process(Context(response=response, callback=self.__call__))
         for result in results:

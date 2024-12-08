@@ -27,7 +27,11 @@ class NextPageDecisionNode(DecisionNode):
                     type=t,
                     result=[
                         ctx.response.follow(
-                            next_page, ctx.callback, meta={"decision": meta.model_dump()} if meta.meta else None
+                            next_page,
+                            ctx.callback,
+                            meta={"decision": meta.model_dump(), "file_name": next_page.replace("/", "_")}
+                            if meta.meta
+                            else None,
                         )
                         for next_page in next_pages
                     ],
