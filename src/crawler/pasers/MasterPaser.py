@@ -20,8 +20,9 @@ class MasterPaser:
     async def __call__(self, response: Response) -> AsyncGenerator[Any, None]:
         """Parse."""
         engine = ParserDecisionEngine(
-            Meta(name="NextPageDecisionNode", type=-1), {"NextPageDecisionNode": NextPageDecisionNode()}
+            Meta.model_validate(response.meta.get("decision")),
+            {"NextPageDecisionNode": NextPageDecisionNode()},
         )
-        results = await engine.process(Context(url=response.url, meta=response.meta))
+        results = await engine.process(Context(response=response, callback=self.__call__))
         for result in results:
             yield result

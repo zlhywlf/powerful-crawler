@@ -3,18 +3,20 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
+from scrapy import Request
 from sqlmodel import SQLModel
 
+from crawler.models.Meta import Meta
 from crawler.models.Result import Result
 
 
 class MetaChecker(SQLModel):
     """meta checker."""
 
-    curr_name: str
+    curr_meta: Meta
     type: int
-    next_name: str | None = None
-    result: list[Result] | None = None
+    next_meta: Meta | None = None
+    result: list[Result | Request] | None = None
 
     class Config:
         """config."""

@@ -13,5 +13,5 @@ class MasterProcessor:
 
     async def __call__(self, item: Result, spider: scrapy.Spider) -> Result:
         """Do."""
-        spider.log(item)
+        spider.log(f"{item.id},{item.type},{len(item.content)}")
         return item

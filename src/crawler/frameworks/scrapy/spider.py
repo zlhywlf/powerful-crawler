@@ -71,7 +71,22 @@ async def init() -> None:
                         json.dumps({
                             "url": _.url,
                             "method": _.method,
-                            "meta": {"a": 1},
+                            "meta": {
+                                "decision": {
+                                    "name": "NextPageDecisionNode",
+                                    "type": -1,
+                                    "meta": [
+                                        {
+                                            "id": 99,
+                                            "name": "NextPageDecisionNode",
+                                            "type": -1,
+                                            "meta": None,
+                                            "config": {"needed": True, "next": None, "type": None},
+                                        },
+                                    ],
+                                    "config": {"needed": True, "next": 'li.next a::attr("href")', "type": "css"},
+                                }
+                            },
                         }),
                     )
                     for _ in targets
