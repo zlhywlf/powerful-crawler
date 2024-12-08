@@ -36,6 +36,7 @@ class ParserDecisionEngine(DecisionEngine):
             result = checker.result
             self._decide(checker)
             meta = checker.next_meta
+            ctx.checker = checker
         if not result:
             msg = f"process failure for {self._meta}"
             raise RuntimeError(msg)

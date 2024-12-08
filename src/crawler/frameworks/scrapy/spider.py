@@ -77,11 +77,23 @@ async def init() -> None:
                                     "type": -1,
                                     "meta": [
                                         {
-                                            "id": 99,
                                             "name": "NextPageDecisionNode",
                                             "type": -1,
+                                            "meta": [
+                                                {
+                                                    "name": "SavePageDecisionNode",
+                                                    "type": 0,
+                                                    "meta": None,
+                                                    "config": None,
+                                                },
+                                            ],
+                                            "config": None,
+                                        },
+                                        {
+                                            "name": "SavePageDecisionNode",
+                                            "type": -1,
                                             "meta": None,
-                                            "config": {"needed": True, "next": None, "type": None},
+                                            "config": None,
                                         },
                                     ],
                                     "config": {"needed": True, "next": 'li.next a::attr("href")', "type": "css"},

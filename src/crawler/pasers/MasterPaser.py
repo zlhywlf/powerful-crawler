@@ -12,6 +12,7 @@ from crawler.models.Context import Context
 from crawler.models.Meta import Meta
 from crawler.pasers.NextPageDecisionNode import NextPageDecisionNode
 from crawler.pasers.ParserDecisionEngine import ParserDecisionEngine
+from crawler.pasers.SavePageDecisionNode import SavePageDecisionNode
 
 
 class MasterPaser:
@@ -21,7 +22,7 @@ class MasterPaser:
         """Parse."""
         engine = ParserDecisionEngine(
             Meta.model_validate(response.meta.get("decision")),
-            {"NextPageDecisionNode": NextPageDecisionNode()},
+            {"NextPageDecisionNode": NextPageDecisionNode(), "SavePageDecisionNode": SavePageDecisionNode()},
         )
         results = await engine.process(Context(response=response, callback=self.__call__))
         for result in results:

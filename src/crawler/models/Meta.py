@@ -12,7 +12,7 @@ from sqlmodel import Column, Field, SQLModel
 class Meta(SQLModel):
     """meta."""
 
-    id: int = Field(None, sa_column=Column(INTEGER(), primary_key=True))
+    id: int | None = Field(None, sa_column=Column(INTEGER(), primary_key=True))
     name: str = Field(None, sa_column=Column(VARCHAR()))
     type: int = Field(None, sa_column=Column(INTEGER()))
     meta: list["Meta"] | None = None

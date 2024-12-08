@@ -8,12 +8,15 @@ from typing import Any
 from scrapy.http.response import Response
 from sqlmodel import SQLModel
 
+from crawler.models.MetaChecker import MetaChecker
+
 
 class Context(SQLModel):
     """context."""
 
     response: Response
     callback: Any
+    checker: MetaChecker | None = None
 
     class Config:
         """config."""
