@@ -28,7 +28,10 @@ class NextPageDecisionNode(DecisionNode):
                     result=[
                         ctx.response.follow(
                             next_page,
-                            meta={"decision": meta.config.get("next"), "file_name": next_page.replace("/", "_")},
+                            meta={
+                                **({"decision": meta.meta[0]} if meta.meta else {}),
+                                "file_name": next_page.replace("/", "_"),
+                            },
                         )
                         for next_page in next_pages
                     ],

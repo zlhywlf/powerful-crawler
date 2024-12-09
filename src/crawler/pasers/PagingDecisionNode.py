@@ -39,7 +39,7 @@ class PagingDecisionNode(DecisionNode):
                     FormRequest(
                         url=url,
                         formdata={"pageNumber": f"{page + 1}", "pageSize": limit},  # type:ignore  [dict-item]
-                        meta={"decision": meta.config.get("next")},
+                        meta={"decision": meta.meta[0]} if meta.meta else None,
                     )
                     for page in range(pages)
                     if page < 1

@@ -97,12 +97,8 @@ simple = {
         {
             "name": "NextPageDecisionNode",
             "type": -1,
-            "meta": None,
-            "config": {
-                "needed": True,
-                "next_path": 'li.next a::attr("href")',
-                "type": "css",
-                "next": {
+            "meta": [
+                {
                     "name": "save",
                     "type": -1,
                     "meta": [
@@ -114,7 +110,12 @@ simple = {
                         },
                     ],
                     "config": None,
-                },
+                }
+            ],
+            "config": {
+                "needed": True,
+                "next_path": 'li.next a::attr("href")',
+                "type": "css",
             },
         },
         {
@@ -135,24 +136,16 @@ deep = {
         {
             "name": "PagingDecisionNode",
             "type": -1,
-            "meta": None,
-            "config": {
-                "needed": False,
-                "limit": r"var\s+limitcount\s*=\s*(\d+)",
-                "count": r'count\s*:\s*["\']?(\d+)["\']?,',
-                "url": r'url\s*:\s*[\'"]([^\'"]+)[\'"]',
-                "next": {
+            "meta": [
+                {
                     "name": "湖北省公共资源产权交易网-list",
                     "type": -1,
                     "meta": [
                         {
                             "name": "ListPageDecisionNode",
                             "type": -1,
-                            "meta": None,
-                            "config": {
-                                "paths": "//tr//a[@title]/@href",
-                                "names": "//tr//a/@title",
-                                "next": {
+                            "meta": [
+                                {
                                     "name": "湖北省公共资源产权交易网-detail",
                                     "type": -1,
                                     "meta": [
@@ -164,12 +157,22 @@ deep = {
                                         },
                                     ],
                                     "config": None,
-                                },
+                                }
+                            ],
+                            "config": {
+                                "paths": "//tr//a[@title]/@href",
+                                "names": "//tr//a/@title",
                             },
                         },
                     ],
                     "config": None,
-                },
+                }
+            ],
+            "config": {
+                "needed": False,
+                "limit": r"var\s+limitcount\s*=\s*(\d+)",
+                "count": r'count\s*:\s*["\']?(\d+)["\']?,',
+                "url": r'url\s*:\s*[\'"]([^\'"]+)[\'"]',
             },
         }
     ],
