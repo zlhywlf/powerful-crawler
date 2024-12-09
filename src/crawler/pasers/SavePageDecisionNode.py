@@ -31,6 +31,6 @@ class SavePageDecisionNode(DecisionNode):
             results.extend(ctx.checker.result or [])
         return MetaChecker(
             curr_meta=meta,
-            type=-1,
+            type=0,
             result=results,
         )

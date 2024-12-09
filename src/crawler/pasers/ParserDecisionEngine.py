@@ -26,17 +26,17 @@ class ParserDecisionEngine(DecisionEngine):
 
     @override
     async def process(self, ctx: Context) -> list[Result | Request]:
-        meta: Meta | None = self._meta
+        checker = MetaChecker(curr_meta=self._meta, type=self._meta.type)
         result: list[Result | Request] | None = None
-        while meta:
-            if meta.name not in self._node_map:
+        while True:
+            self._decide(checker)
+            meta: Meta | None = checker.next_meta
+            if not meta or meta.name not in self._node_map:
                 break
+            ctx.checker = checker
             node = self._node_map[meta.name]
             checker = await node.handle(ctx, meta)
             result = checker.result
-            self._decide(checker)
-            meta = checker.next_meta
-            ctx.checker = checker
         if not result:
             msg = f"process failure for {self._meta}"
             raise RuntimeError(msg)
@@ -46,9 +46,6 @@ class ParserDecisionEngine(DecisionEngine):
         if not self._meta.meta:
             return
         for meta in self._meta.meta:
-            if meta.name != checker.curr_meta.name or not meta.meta:
-                continue
-            for m in meta.meta:
-                if m.type == checker.type:
-                    checker.next_meta = m
-                    return
+            if meta.type == checker.type:
+                checker.next_meta = meta
+                return

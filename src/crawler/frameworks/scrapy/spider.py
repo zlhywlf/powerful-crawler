@@ -119,64 +119,51 @@ simple = {
 
 deep = {
     "url": "https://www.hbggzypm.cn//jynoticeController/tojynoticelist",
-    "name": "PagingDecisionNode",
+    "name": "湖北省公共资源产权交易网-paging",
     "type": -1,
     "meta": [
         {
             "name": "PagingDecisionNode",
             "type": -1,
-            "meta": [
-                {
-                    "name": "SavePageDecisionNode",
-                    "type": 0,
-                    "meta": None,
-                    "config": None,
-                },
-            ],
-            "config": None,
-        },
-        {
-            "name": "SavePageDecisionNode",
-            "type": -1,
             "meta": None,
-            "config": None,
-        },
-    ],
-    "config": {
-        "needed": False,
-        "limit": r"var\s+limitcount\s*=\s*(\d+)",
-        "count": r'count\s*:\s*["\']?(\d+)["\']?,',
-        "url": r'url\s*:\s*[\'"]([^\'"]+)[\'"]',
-        "next": {
-            "name": "ListPageDecisionNode",
-            "type": -1,
-            "meta": [
-                {
-                    "name": "ListPageDecisionNode",
-                    "type": -1,
-                    "meta": None,
-                    "config": None,
-                },
-            ],
             "config": {
-                "paths": "//tr//a[@title]/@href",
-                "names": "//tr//a/@title",
+                "needed": False,
+                "limit": r"var\s+limitcount\s*=\s*(\d+)",
+                "count": r'count\s*:\s*["\']?(\d+)["\']?,',
+                "url": r'url\s*:\s*[\'"]([^\'"]+)[\'"]',
                 "next": {
-                    "name": "SavePageDecisionNode",
+                    "name": "湖北省公共资源产权交易网-list",
                     "type": -1,
                     "meta": [
                         {
-                            "name": "SavePageDecisionNode",
+                            "name": "ListPageDecisionNode",
                             "type": -1,
                             "meta": None,
-                            "config": None,
+                            "config": {
+                                "paths": "//tr//a[@title]/@href",
+                                "names": "//tr//a/@title",
+                                "next": {
+                                    "name": "湖北省公共资源产权交易网-detail",
+                                    "type": -1,
+                                    "meta": [
+                                        {
+                                            "name": "SavePageDecisionNode",
+                                            "type": -1,
+                                            "meta": None,
+                                            "config": None,
+                                        },
+                                    ],
+                                    "config": None,
+                                },
+                            },
                         },
                     ],
                     "config": None,
                 },
             },
-        },
-    },
+        }
+    ],
+    "config": None,
 }
 
 asyncio.run(init(deep))

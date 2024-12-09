@@ -16,10 +16,10 @@ class NextPageDecisionNode(DecisionNode):
 
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
-        t = -1
+        t = 0
         if meta.config:
             if meta.config.get("needed"):
-                t = 0
+                t = 1
             if meta.config.get("type") == "css":
                 next_pages = ctx.response.css(meta.config.get("next")).extract()
                 return MetaChecker(

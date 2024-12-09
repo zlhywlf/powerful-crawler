@@ -16,19 +16,17 @@ class ListPageDecisionNode(DecisionNode):
 
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
-        t = -1
+        t = 0
         if meta.config:
             if meta.config.get("needed"):
-                t = 0
+                t = 1
             paths = ctx.response.xpath(meta.config.get("paths")).extract()
             names = ctx.response.xpath(meta.config.get("names")).extract()
             return MetaChecker(
                 curr_meta=meta,
                 type=t,
                 result=[
-                    ctx.response.follow(
-                        path, meta={"decision": meta.config.get("next"), "file_name": name} if meta.meta else None
-                    )
+                    ctx.response.follow(path, meta={"decision": meta.config.get("next"), "file_name": name})
                     for path, name in zip(paths, names, strict=False)
                 ],
             )

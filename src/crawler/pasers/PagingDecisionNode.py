@@ -20,10 +20,10 @@ class PagingDecisionNode(DecisionNode):
 
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
-        t = -1
+        t = 0
         if meta.config:
             if meta.config.get("needed"):
-                t = 0
+                t = 1
             text = ctx.response.text
             limit_match = re.search(meta.config.get("limit", ""), text)
             limit = limit_match.group(1) if limit_match else None
@@ -42,7 +42,7 @@ class PagingDecisionNode(DecisionNode):
                         meta={"decision": meta.config.get("next")},
                     )
                     for page in range(pages)
-                    if page < 3
+                    if page < 1
                 ],
             )
         return MetaChecker(
