@@ -31,6 +31,6 @@ class MasterPaser:
                 "ListPageDecisionNode": ListPageDecisionNode(),
             },
         )
-        results = await engine.process(Context(response=response, callback=self.__call__))
+        results = await engine.process(Context(response=response))
         for result in results:
             yield result
