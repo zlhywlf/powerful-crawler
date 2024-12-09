@@ -104,7 +104,7 @@ simple = {
                     "meta": [
                         {
                             "name": "SavePageDecisionNode",
-                            "type": -1,
+                            "type": 1,
                             "meta": None,
                             "config": None,
                         },
