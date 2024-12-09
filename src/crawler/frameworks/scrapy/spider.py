@@ -91,30 +91,40 @@ async def init(data: dict[str, Any]) -> None:
 
 simple = {
     "url": "https://quotes.toscrape.com/tag/humor/",
-    "name": "NextPageDecisionNode",
+    "name": "quotes",
     "type": -1,
     "meta": [
         {
             "name": "NextPageDecisionNode",
             "type": -1,
-            "meta": [
-                {
-                    "name": "SavePageDecisionNode",
-                    "type": 0,
-                    "meta": None,
+            "meta": None,
+            "config": {
+                "needed": True,
+                "next_path": 'li.next a::attr("href")',
+                "type": "css",
+                "next": {
+                    "name": "save",
+                    "type": -1,
+                    "meta": [
+                        {
+                            "name": "SavePageDecisionNode",
+                            "type": -1,
+                            "meta": None,
+                            "config": None,
+                        },
+                    ],
                     "config": None,
                 },
-            ],
-            "config": None,
+            },
         },
         {
             "name": "SavePageDecisionNode",
-            "type": -1,
+            "type": 1,
             "meta": None,
             "config": None,
         },
     ],
-    "config": {"needed": True, "next": 'li.next a::attr("href")', "type": "css"},
+    "config": None,
 }
 
 deep = {
@@ -166,4 +176,4 @@ deep = {
     "config": None,
 }
 
-asyncio.run(init(deep))
+asyncio.run(init(simple))

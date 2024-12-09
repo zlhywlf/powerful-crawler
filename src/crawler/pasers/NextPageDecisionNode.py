@@ -21,7 +21,7 @@ class NextPageDecisionNode(DecisionNode):
             if meta.config.get("needed"):
                 t = 1
             if meta.config.get("type") == "css":
-                next_pages = ctx.response.css(meta.config.get("next")).extract()
+                next_pages = ctx.response.css(meta.config.get("next_path")).extract()
                 return MetaChecker(
                     curr_meta=meta,
                     type=t,
@@ -29,9 +29,7 @@ class NextPageDecisionNode(DecisionNode):
                         ctx.response.follow(
                             next_page,
                             ctx.callback,
-                            meta={"decision": meta.model_dump(), "file_name": next_page.replace("/", "_")}
-                            if meta.meta
-                            else None,
+                            meta={"decision": meta.config.get("next"), "file_name": next_page.replace("/", "_")},
                         )
                         for next_page in next_pages
                     ],
