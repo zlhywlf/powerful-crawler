@@ -4,18 +4,19 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
 import asyncio
-import json
 import threading
 from collections.abc import Callable
 from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlmodel import SQLModel
 
 from crawler.congfig import LOG_FORMAT, NAME, REDIS_CLS
 from crawler.frameworks.scrapy.PowerfulSpider import PowerfulSpider
-from crawler.models.Target import Target
+from crawler.models.po.Base import Base
+from crawler.models.po.MetaConfig import MetaConfig
+from crawler.models.po.MetaInfo import MetaInfo
+from crawler.models.po.TaskInfo import TaskInfo
 from crawler.pasers.MasterPaser import MasterPaser
 from crawler.processors.MasterProcessor import MasterProcessor
 
@@ -42,21 +43,109 @@ g.setdefault(
 g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": MasterProcessor()}))
 
 
-async def init(data: dict[str, Any]) -> None:
+async def init(index: int) -> None:
     """Init."""
-    targets: list[Target] = []
     engine = create_async_engine("sqlite+aiosqlite://", echo=True)
     async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.drop_all)
-        await conn.run_sync(SQLModel.metadata.create_all)
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         async with session.begin():
-            if "url" in data:
-                session.add_all([Target(url=data.pop("url"), method="get")])
-        stmt = select(Target)
-        result = await session.execute(stmt)
-        targets = list(result.scalars())
+            session.add_all([
+                TaskInfo(
+                    url="https://quotes.toscrape.com/tag/humor/",
+                    method="get",
+                    meta=MetaInfo(
+                        name="quotes",
+                        type=-1,
+                        meta=[
+                            MetaInfo(
+                                name="NextPageDecisionNode",
+                                type=-1,
+                                meta=[
+                                    MetaInfo(
+                                        name="SavePageDecisionNode",
+                                        type=1,
+                                        meta=[],
+                                        config=[],
+                                    )
+                                ],
+                                config=[
+                                    MetaConfig(name="needed", value="True", type="bool"),
+                                    MetaConfig(name="next_path", value='li.next a::attr("href")', type="str"),
+                                    MetaConfig(name="type", value="css", type="str"),
+                                ],
+                            ),
+                            MetaInfo(
+                                name="SavePageDecisionNode",
+                                type=1,
+                                meta=[],
+                                config=[],
+                            ),
+                        ],
+                        config=[],
+                    ),
+                ),
+                TaskInfo(
+                    url="https://www.hbggzypm.cn//jynoticeController/tojynoticelist",
+                    method="get",
+                    meta=MetaInfo(
+                        name="湖北省公共资源产权交易网-paging",
+                        type=-1,
+                        meta=[
+                            MetaInfo(
+                                name="PagingDecisionNode",
+                                type=-1,
+                                meta=[
+                                    MetaInfo(
+                                        name="湖北省公共资源产权交易网-list",
+                                        type=-1,
+                                        meta=[
+                                            MetaInfo(
+                                                name="ListPageDecisionNode",
+                                                type=-1,
+                                                meta=[
+                                                    MetaInfo(
+                                                        name="湖北省公共资源产权交易网-detail",
+                                                        type=-1,
+                                                        meta=[
+                                                            MetaInfo(
+                                                                name="SavePageDecisionNode",
+                                                                type=-1,
+                                                                meta=[],
+                                                                config=[],
+                                                            )
+                                                        ],
+                                                        config=[],
+                                                    )
+                                                ],
+                                                config=[
+                                                    MetaConfig(name="paths", value="//tr//a[@title]/@href", type="str"),
+                                                    MetaConfig(name="names", value="//tr//a/@title", type="str"),
+                                                ],
+                                            )
+                                        ],
+                                        config=[],
+                                    )
+                                ],
+                                config=[
+                                    MetaConfig(name="needed", value="False", type="bool"),
+                                    MetaConfig(name="limit", value=r"var\s+limitcount\s*=\s*(\d+)", type="str"),
+                                    MetaConfig(name="count", value=r'count\s*:\s*["\']?(\d+)["\']?,', type="str"),
+                                    MetaConfig(name="url", value=r'url\s*:\s*[\'"]([^\'"]+)[\'"]', type="str"),
+                                ],
+                            )
+                        ],
+                        config=[],
+                    ),
+                ),
+            ])
+        stmt = select(TaskInfo).where(TaskInfo.id == index)
+        result = (await session.execute(stmt)).scalar()
+        if not result:
+            raise RuntimeError
+        task = TaskInfo.load_task(result)
     await engine.dispose()
 
     def wrapper(func: type) -> Callable[[Any], None]:
@@ -64,19 +153,12 @@ async def init(data: dict[str, Any]) -> None:
             func(s, *args, **kwargs)
             threading.Timer(
                 2,
-                lambda: [
-                    s._client.execute_command(
-                        "ZADD",
-                        "powerful_spider",
-                        1,
-                        json.dumps({
-                            "url": _.url,
-                            "method": _.method,
-                            "meta": {"decision": data, "file_name": "start_page"},
-                        }),
-                    )
-                    for _ in targets
-                ],
+                lambda: s._client.execute_command(
+                    "ZADD",
+                    "powerful_spider",
+                    1,
+                    task.model_dump_json(),
+                ),
             ).start()
             threading.Timer(
                 2,
@@ -89,99 +171,4 @@ async def init(data: dict[str, Any]) -> None:
     cls.__init__ = wrapper(cls.__init__)  # type:ignore  [misc]
 
 
-simple = {
-    "url": "https://quotes.toscrape.com/tag/humor/",
-    "id": 99,
-    "name": "quotes",
-    "type": -1,
-    "meta": [
-        {
-            "id": 99,
-            "name": "NextPageDecisionNode",
-            "type": -1,
-            "meta": [
-                {
-                    "id": 99,
-                    "name": "save",
-                    "type": -1,
-                    "meta": [
-                        {
-                            "id": 99,
-                            "name": "SavePageDecisionNode",
-                            "type": 1,
-                            "meta": [],
-                            "config": {},
-                        },
-                    ],
-                    "config": {},
-                }
-            ],
-            "config": {
-                "needed": True,
-                "next_path": 'li.next a::attr("href")',
-                "type": "css",
-            },
-        },
-        {
-            "id": 99,
-            "name": "SavePageDecisionNode",
-            "type": 1,
-            "meta": [],
-            "config": {},
-        },
-    ],
-    "config": {},
-}
-
-deep = {
-    "url": "https://www.hbggzypm.cn//jynoticeController/tojynoticelist",
-    "name": "湖北省公共资源产权交易网-paging",
-    "type": -1,
-    "meta": [
-        {
-            "name": "PagingDecisionNode",
-            "type": -1,
-            "meta": [
-                {
-                    "name": "湖北省公共资源产权交易网-list",
-                    "type": -1,
-                    "meta": [
-                        {
-                            "name": "ListPageDecisionNode",
-                            "type": -1,
-                            "meta": [
-                                {
-                                    "name": "湖北省公共资源产权交易网-detail",
-                                    "type": -1,
-                                    "meta": [
-                                        {
-                                            "name": "SavePageDecisionNode",
-                                            "type": -1,
-                                            "meta": [],
-                                            "config": {},
-                                        },
-                                    ],
-                                    "config": {},
-                                }
-                            ],
-                            "config": {
-                                "paths": "//tr//a[@title]/@href",
-                                "names": "//tr//a/@title",
-                            },
-                        },
-                    ],
-                    "config": {},
-                }
-            ],
-            "config": {
-                "needed": False,
-                "limit": r"var\s+limitcount\s*=\s*(\d+)",
-                "count": r'count\s*:\s*["\']?(\d+)["\']?,',
-                "url": r'url\s*:\s*[\'"]([^\'"]+)[\'"]',
-            },
-        }
-    ],
-    "config": {},
-}
-
-asyncio.run(init(simple))
+asyncio.run(init(1))

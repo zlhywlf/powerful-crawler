@@ -14,4 +14,4 @@ class Task(BaseModel):
     id: int
     url: str
     method: str
-    meta: list[Meta]
+    meta: Meta

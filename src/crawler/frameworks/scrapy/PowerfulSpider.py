@@ -7,7 +7,6 @@ import time
 from collections.abc import Iterable
 from typing import Any, Self, override
 
-from pydantic import TypeAdapter
 from scrapy import FormRequest, Request, signals
 from scrapy.crawler import Crawler
 from scrapy.exceptions import DontCloseSpider
@@ -15,6 +14,7 @@ from scrapy.spiders import Spider
 
 from crawler.clients import get_redis_from_settings
 from crawler.core.QueueClient import QueueClient
+from crawler.models.dto.Task import Task
 
 
 class PowerfulSpider(Spider):
@@ -27,7 +27,6 @@ class PowerfulSpider(Spider):
         self._batch_size = 32
         self._max_idle_time = 0
         self._client = client
-        self._type_adapter = TypeAdapter(dict[str, Any])
         self._idle_start_time = 0
 
     @override
@@ -35,11 +34,11 @@ class PowerfulSpider(Spider):
         found = 0
         data = self._client.pop_priority(self._key, end=self._batch_size - 1, min_=-self._batch_size, max_=-1)
         for d in data:
-            param = self._type_adapter.validate_json(d)
-            url = param.pop("url")
-            method = str(param.pop("method")).upper()
-            meta = param.pop("meta")
-            reqs = FormRequest(url=url, method=method, meta=meta, formdata=param)
+            task = Task.model_validate_json(d)
+            url = task.url
+            method = task.method.upper()
+            meta = task.meta.model_dump()
+            reqs = FormRequest(url=url, method=method, meta={"decision": meta})
             if isinstance(reqs, Iterable):
                 for req in reqs:
                     yield req

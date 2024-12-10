@@ -18,7 +18,7 @@ class TaskInfo(Base):
 
     url: Mapped[str] = mapped_column(String())
     method: Mapped[str] = mapped_column(String())
-    meta: Mapped[list[MetaInfo]] = relationship(lazy="immediate")
+    meta: Mapped[MetaInfo] = relationship(lazy="immediate")
 
     @classmethod
     def load_task(cls, task_info: "TaskInfo") -> Task:
@@ -27,5 +27,5 @@ class TaskInfo(Base):
             id=task_info.id,
             url=task_info.url,
             method=task_info.method,
-            meta=[MetaInfo.load_meta(_) for _ in task_info.meta],
+            meta=MetaInfo.load_meta(task_info.meta),
         )
