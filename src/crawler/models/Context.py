@@ -3,19 +3,14 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
+from pydantic import BaseModel
 from scrapy.http.response import Response
-from sqlmodel import SQLModel
 
 from crawler.models.MetaChecker import MetaChecker
 
 
-class Context(SQLModel):
+class Context(BaseModel, arbitrary_types_allowed=True):
     """context."""
 
     response: Response
     checker: MetaChecker | None = None
-
-    class Config:
-        """config."""
-
-        arbitrary_types_allowed = True
