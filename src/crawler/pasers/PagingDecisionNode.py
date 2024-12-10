@@ -11,7 +11,7 @@ from scrapy import FormRequest
 
 from crawler.core.DecisionNode import DecisionNode
 from crawler.models.Context import Context
-from crawler.models.Meta import Meta
+from crawler.models.dto.Meta import Meta
 from crawler.models.MetaChecker import MetaChecker
 
 

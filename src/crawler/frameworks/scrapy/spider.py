@@ -91,25 +91,29 @@ async def init(data: dict[str, Any]) -> None:
 
 simple = {
     "url": "https://quotes.toscrape.com/tag/humor/",
+    "id": 99,
     "name": "quotes",
     "type": -1,
     "meta": [
         {
+            "id": 99,
             "name": "NextPageDecisionNode",
             "type": -1,
             "meta": [
                 {
+                    "id": 99,
                     "name": "save",
                     "type": -1,
                     "meta": [
                         {
+                            "id": 99,
                             "name": "SavePageDecisionNode",
                             "type": 1,
-                            "meta": None,
-                            "config": None,
+                            "meta": [],
+                            "config": {},
                         },
                     ],
-                    "config": None,
+                    "config": {},
                 }
             ],
             "config": {
@@ -119,13 +123,14 @@ simple = {
             },
         },
         {
+            "id": 99,
             "name": "SavePageDecisionNode",
             "type": 1,
-            "meta": None,
-            "config": None,
+            "meta": [],
+            "config": {},
         },
     ],
-    "config": None,
+    "config": {},
 }
 
 deep = {
@@ -152,11 +157,11 @@ deep = {
                                         {
                                             "name": "SavePageDecisionNode",
                                             "type": -1,
-                                            "meta": None,
-                                            "config": None,
+                                            "meta": [],
+                                            "config": {},
                                         },
                                     ],
-                                    "config": None,
+                                    "config": {},
                                 }
                             ],
                             "config": {
@@ -165,7 +170,7 @@ deep = {
                             },
                         },
                     ],
-                    "config": None,
+                    "config": {},
                 }
             ],
             "config": {
@@ -176,7 +181,7 @@ deep = {
             },
         }
     ],
-    "config": None,
+    "config": {},
 }
 
 asyncio.run(init(simple))

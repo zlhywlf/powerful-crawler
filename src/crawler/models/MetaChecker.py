@@ -6,7 +6,7 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 from scrapy import Request
 from sqlmodel import SQLModel
 
-from crawler.models.Meta import Meta
+from crawler.models.dto.Meta import Meta
 from crawler.models.Result import Result
 
 
