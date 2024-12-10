@@ -10,10 +10,10 @@ from scrapy import Request
 
 from crawler.core.DecisionEngine import DecisionEngine
 from crawler.core.DecisionNode import DecisionNode
-from crawler.models.Context import Context
+from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
-from crawler.models.MetaChecker import MetaChecker
-from crawler.models.Result import Result
+from crawler.models.dto.MetaChecker import MetaChecker
+from crawler.models.dto.Result import Result
 
 
 class ParserDecisionEngine(DecisionEngine):

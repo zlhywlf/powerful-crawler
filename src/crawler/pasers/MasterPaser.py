@@ -8,7 +8,7 @@ from typing import Any
 
 from scrapy.http.response import Response
 
-from crawler.models.Context import Context
+from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
 from crawler.pasers.ListPageDecisionNode import ListPageDecisionNode
 from crawler.pasers.NextPageDecisionNode import NextPageDecisionNode

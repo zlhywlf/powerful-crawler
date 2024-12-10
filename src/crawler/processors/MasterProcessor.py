@@ -8,7 +8,7 @@ from pathlib import Path
 
 import scrapy
 
-from crawler.models.Result import Result
+from crawler.models.dto.Result import Result
 
 
 class MasterProcessor:

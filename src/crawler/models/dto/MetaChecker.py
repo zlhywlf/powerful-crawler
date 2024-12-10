@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from scrapy import Request
 
 from crawler.models.dto.Meta import Meta
-from crawler.models.Result import Result
+from crawler.models.dto.Result import Result
 
 
 class MetaChecker(BaseModel, arbitrary_types_allowed=True):
