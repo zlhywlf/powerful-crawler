@@ -3,6 +3,8 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
+from importlib import import_module
+
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -26,10 +28,20 @@ class MetaInfo(Base):
     @classmethod
     def load_meta(cls, meta_info: "MetaInfo") -> Meta:
         """Load meta."""
+
+        def to_type(t: str, v: str) -> object:
+            """To type."""
+            path = f"builtins.{t}"
+            dot = path.rindex(".")
+            module, name = path[:dot], path[dot + 1 :]
+            mod = import_module(module)
+            obj = getattr(mod, name)
+            return obj(v)
+
         return Meta(
             id=meta_info.id,
             name=meta_info.name,
             type=meta_info.type,
             meta=[cls.load_meta(_) for _ in meta_info.meta],
-            config={_.name: _.value for _ in meta_info.config},
+            config={_.name: to_type(_.type, _.value) for _ in meta_info.config},
         )
