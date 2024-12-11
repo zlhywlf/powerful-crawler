@@ -21,9 +21,9 @@ class SavePageDecisionNode(DecisionNode):
         results: list[Result | Request] = [
             Result(
                 id=99,
-                type=ctx.response.headers.get("Content-Type", "unknown"),
-                content=ctx.response.body,
-                name=ctx.response.meta.get("file_name", ""),
+                type=(await ctx.response.headers).get("Content-Type", "unknown"),
+                content=await ctx.response.body,
+                name=(await ctx.response.meta).get("file_name", ""),
             )
         ]
         if ctx.checker:

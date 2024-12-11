@@ -20,14 +20,14 @@ class ListPageDecisionNode(DecisionNode):
         if meta.config:
             if meta.config.get("needed"):
                 t = 1
-            paths = ctx.response.xpath(meta.config.get("paths")).extract()
-            names = ctx.response.xpath(meta.config.get("names")).extract()
+            paths = await ctx.response.extract_by_xpath(str(meta.config.get("paths")))
+            names = await ctx.response.extract_by_xpath(str(meta.config.get("names")))
             return MetaChecker(
                 curr_meta=meta,
                 type=t,
                 result=[
                     self.request_factory.create(
-                        url=ctx.response.urljoin(path),
+                        url=await ctx.response.urljoin(path),
                         meta={**({"decision": meta.meta[0]} if meta.meta else {}), "file_name": name},
                     )
                     for path, name in zip(paths, names, strict=False)

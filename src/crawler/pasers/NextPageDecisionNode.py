@@ -21,7 +21,7 @@ class NextPageDecisionNode(DecisionNode):
             if meta.config.get("needed"):
                 t = 1
             if meta.config.get("type") == "css":
-                next_pages = ctx.response.css(meta.config.get("next_path")).extract()
+                next_pages = await ctx.response.extract_by_css(str(meta.config.get("next_path")))
                 next_meta = meta.model_copy()
                 next_meta.meta.append(meta)
                 return MetaChecker(
@@ -29,7 +29,7 @@ class NextPageDecisionNode(DecisionNode):
                     type=t,
                     result=[
                         self.request_factory.create(
-                            url=ctx.response.urljoin(next_page),
+                            url=await ctx.response.urljoin(next_page),
                             meta={
                                 "decision": next_meta,
                                 "file_name": next_page.replace("/", "_"),

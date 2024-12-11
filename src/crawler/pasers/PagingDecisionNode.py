@@ -22,7 +22,7 @@ class PagingDecisionNode(DecisionNode):
         if meta.config:
             if meta.config.get("needed"):
                 t = 1
-            text = ctx.response.text
+            text = await ctx.response.text
             limit_match = re.search(meta.config.get("limit", ""), text)
             limit = limit_match.group(1) if limit_match else None
             count_match = re.search(meta.config.get("count", ""), text)
