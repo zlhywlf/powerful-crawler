@@ -8,6 +8,7 @@ import re
 from typing import override
 
 from crawler.core.DecisionNode import DecisionNode
+from crawler.models.dto.BaseConfig import BaseConfig
 from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
 from crawler.models.dto.MetaChecker import MetaChecker
@@ -18,13 +19,14 @@ class PagingDecisionNode(DecisionNode):
 
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
-        t = 1 if meta.config.get("needed") else 2
+        config = PagingDecisionNode.Config.model_validate_json(meta.config)
+        t = 1 if config.needed else 2
         text = await ctx.response.text
-        limit_match = re.search(meta.config.get("limit", ""), text)
+        limit_match = re.search(config.limit, text)
         limit = limit_match.group(1) if limit_match else None
-        count_match = re.search(meta.config.get("count", ""), text)
+        count_match = re.search(config.count, text)
         count = count_match.group(1) if count_match else None
-        url_match = re.search(meta.config.get("url", ""), text)
+        url_match = re.search(config.url, text)
         url = url_match.group(1) if url_match else None
         pages = math.ceil(int(count) / int(limit))  # type:ignore  [arg-type]
         return MetaChecker(
@@ -40,3 +42,10 @@ class PagingDecisionNode(DecisionNode):
                 if page < 1
             ],
         )
+
+    class Config(BaseConfig):
+        """config."""
+
+        limit: str
+        count: str
+        url: str

@@ -7,6 +7,7 @@ from typing import override
 
 from crawler.core.DecisionNode import DecisionNode
 from crawler.core.Request import Request
+from crawler.models.dto.BaseConfig import BaseConfig
 from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
 from crawler.models.dto.MetaChecker import MetaChecker
@@ -18,9 +19,10 @@ class ListPageDecisionNode(DecisionNode):
 
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
-        t = 1 if meta.config.get("needed") else 2
-        paths = await ctx.response.extract_by_xpath(str(meta.config.get("paths")))
-        names = await ctx.response.extract_by_xpath(str(meta.config.get("names")))
+        config = ListPageDecisionNode.Config.model_validate_json(meta.config)
+        t = 1 if config.needed else 2
+        paths = await ctx.response.extract_by_xpath(config.paths)
+        names = await ctx.response.extract_by_xpath(config.names)
         result: list[Result | Request] | None = None
         if paths and names:
             result = [
@@ -35,3 +37,9 @@ class ListPageDecisionNode(DecisionNode):
             type=t,
             result=result,
         )
+
+    class Config(BaseConfig):
+        """config."""
+
+        paths: str
+        names: str

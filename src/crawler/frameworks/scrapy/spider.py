@@ -12,11 +12,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from crawler.congfig import LOG_FORMAT, NAME, REDIS_CLS
+from crawler.decisions.pasers.nodes.ListPageDecisionNode import ListPageDecisionNode
+from crawler.decisions.pasers.nodes.NextPageDecisionNode import NextPageDecisionNode
+from crawler.decisions.pasers.nodes.PagingDecisionNode import PagingDecisionNode
 from crawler.frameworks.scrapy.PowerfulSpider import PowerfulSpider
 from crawler.frameworks.scrapy.ScrapyPaser import ScrapyPaser
 from crawler.frameworks.scrapy.ScrapyProcessor import ScrapyProcessor
 from crawler.models.po.Base import Base
-from crawler.models.po.MetaConfig import MetaConfig
 from crawler.models.po.MetaInfo import MetaInfo
 from crawler.models.po.TaskInfo import TaskInfo
 
@@ -68,23 +70,21 @@ async def init(index: int) -> None:
                                         name="SavePageDecisionNode",
                                         type=1,
                                         meta=[],
-                                        config=[],
+                                        config=None,
                                     )
                                 ],
-                                config=[
-                                    MetaConfig(name="needed", value="True", type="bool"),
-                                    MetaConfig(name="next_path", value='li.next a::attr("href")', type="str"),
-                                    MetaConfig(name="type", value="css", type="str"),
-                                ],
+                                config=NextPageDecisionNode.Config(
+                                    needed=True, next_path='li.next a::attr("href")', type="css"
+                                ).model_dump_json(),
                             ),
                             MetaInfo(
                                 name="SavePageDecisionNode",
                                 type=1,
                                 meta=[],
-                                config=[],
+                                config=None,
                             ),
                         ],
-                        config=[],
+                        config=None,
                     ),
                 ),
                 TaskInfo(
@@ -114,30 +114,29 @@ async def init(index: int) -> None:
                                                                 name="SavePageDecisionNode",
                                                                 type=0,
                                                                 meta=[],
-                                                                config=[],
+                                                                config=None,
                                                             )
                                                         ],
-                                                        config=[],
+                                                        config=None,
                                                     )
                                                 ],
-                                                config=[
-                                                    MetaConfig(name="paths", value="//tr//a[@title]/@href", type="str"),
-                                                    MetaConfig(name="names", value="//tr//a/@title", type="str"),
-                                                ],
+                                                config=ListPageDecisionNode.Config(
+                                                    paths="//tr//a[@title]/@href",
+                                                    names="//tr//a/@title",
+                                                ).model_dump_json(),
                                             )
                                         ],
-                                        config=[],
+                                        config=None,
                                     )
                                 ],
-                                config=[
-                                    MetaConfig(name="needed", value="False", type="bool"),
-                                    MetaConfig(name="limit", value=r"var\s+limitcount\s*=\s*(\d+)", type="str"),
-                                    MetaConfig(name="count", value=r'count\s*:\s*["\']?(\d+)["\']?,', type="str"),
-                                    MetaConfig(name="url", value=r'url\s*:\s*[\'"]([^\'"]+)[\'"]', type="str"),
-                                ],
+                                config=PagingDecisionNode.Config(
+                                    limit=r"var\s+limitcount\s*=\s*(\d+)",
+                                    count=r'count\s*:\s*["\']?(\d+)["\']?,',
+                                    url=r'url\s*:\s*[\'"]([^\'"]+)[\'"]',
+                                ).model_dump_json(),
                             )
                         ],
-                        config=[],
+                        config=None,
                     ),
                 ),
             ])

@@ -7,6 +7,7 @@ from typing import override
 
 from crawler.core.DecisionNode import DecisionNode
 from crawler.core.Request import Request
+from crawler.models.dto.BaseConfig import BaseConfig
 from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
 from crawler.models.dto.MetaChecker import MetaChecker
@@ -18,10 +19,11 @@ class NextPageDecisionNode(DecisionNode):
 
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
-        t = 1 if meta.config.get("needed") else 2
+        config = NextPageDecisionNode.Config.model_validate_json(meta.config)
+        t = 1 if config.needed else 2
         result: list[Result | Request] | None = None
-        if meta.config.get("type") == "css":
-            next_pages = await ctx.response.extract_by_css(str(meta.config.get("next_path")))
+        if config.type == "css":
+            next_pages = await ctx.response.extract_by_css(config.next_path)
             next_meta = meta.model_copy()
             next_meta.meta.append(meta)
             result = [
@@ -39,3 +41,9 @@ class NextPageDecisionNode(DecisionNode):
             type=t,
             result=result,
         )
+
+    class Config(BaseConfig):
+        """config."""
+
+        next_path: str
+        type: str
