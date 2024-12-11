@@ -13,12 +13,12 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from crawler.congfig import LOG_FORMAT, NAME, REDIS_CLS
 from crawler.frameworks.scrapy.PowerfulSpider import PowerfulSpider
+from crawler.frameworks.scrapy.ScrapyPaser import ScrapyPaser
+from crawler.frameworks.scrapy.ScrapyProcessor import ScrapyProcessor
 from crawler.models.po.Base import Base
 from crawler.models.po.MetaConfig import MetaConfig
 from crawler.models.po.MetaInfo import MetaInfo
 from crawler.models.po.TaskInfo import TaskInfo
-from crawler.pasers.MasterPaser import MasterPaser
-from crawler.processors.MasterProcessor import MasterProcessor
 
 g = globals()
 spider_name = f"{NAME}Spider"
@@ -36,11 +36,11 @@ g.setdefault(
                 "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
                 "REDIS_CLS": REDIS_CLS,
             },
-            "parse": MasterPaser(),
+            "parse": ScrapyPaser(),
         },
     ),
 )
-g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": MasterProcessor()}))
+g.setdefault(pipeliner_name, type(pipeliner_name, (), {"process_item": ScrapyProcessor()}))
 
 
 async def init(index: int) -> None:

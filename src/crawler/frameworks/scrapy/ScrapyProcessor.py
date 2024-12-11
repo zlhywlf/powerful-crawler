@@ -11,8 +11,8 @@ import scrapy
 from crawler.models.dto.Result import Result
 
 
-class MasterProcessor:
-    """master processor."""
+class ScrapyProcessor:
+    """scrapy processor."""
 
     async def __call__(self, item: Result, spider: scrapy.Spider) -> Result:
         """Do."""

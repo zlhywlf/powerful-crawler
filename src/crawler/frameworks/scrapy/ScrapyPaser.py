@@ -20,8 +20,8 @@ from crawler.pasers.ParserDecisionEngine import ParserDecisionEngine
 from crawler.pasers.SavePageDecisionNode import SavePageDecisionNode
 
 
-class MasterPaser:
-    """master paser."""
+class ScrapyPaser:
+    """scrapy paser."""
 
     def __init__(self) -> None:
         """Init."""
