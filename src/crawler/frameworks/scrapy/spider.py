@@ -171,4 +171,4 @@ async def init(index: int) -> None:
     cls.__init__ = wrapper(cls.__init__)  # type:ignore  [misc]
 
 
-asyncio.run(init(1))
+asyncio.run(init(2))

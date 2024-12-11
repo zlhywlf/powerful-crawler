@@ -7,8 +7,6 @@ import math
 import re
 from typing import override
 
-from scrapy import FormRequest
-
 from crawler.core.DecisionNode import DecisionNode
 from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
@@ -36,9 +34,9 @@ class PagingDecisionNode(DecisionNode):
                 curr_meta=meta,
                 type=t,
                 result=[
-                    FormRequest(
+                    self.rf.create(
                         url=url,
-                        formdata={"pageNumber": f"{page + 1}", "pageSize": limit},  # type:ignore  [dict-item]
+                        formdata={"pageNumber": f"{page + 1}", "pageSize": limit},
                         meta={"decision": meta.meta[0]} if meta.meta else None,
                     )
                     for page in range(pages)

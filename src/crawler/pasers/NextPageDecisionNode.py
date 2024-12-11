@@ -28,8 +28,8 @@ class NextPageDecisionNode(DecisionNode):
                     curr_meta=meta,
                     type=t,
                     result=[
-                        ctx.response.follow(
-                            next_page,
+                        self.rf.create(
+                            url=ctx.response.urljoin(next_page),
                             meta={
                                 "decision": next_meta,
                                 "file_name": next_page.replace("/", "_"),

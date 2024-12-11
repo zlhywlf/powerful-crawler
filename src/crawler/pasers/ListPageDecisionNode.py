@@ -26,8 +26,9 @@ class ListPageDecisionNode(DecisionNode):
                 curr_meta=meta,
                 type=t,
                 result=[
-                    ctx.response.follow(
-                        path, meta={**({"decision": meta.meta[0]} if meta.meta else {}), "file_name": name}
+                    self.rf.create(
+                        url=ctx.response.urljoin(path),
+                        meta={**({"decision": meta.meta[0]} if meta.meta else {}), "file_name": name},
                     )
                     for path, name in zip(paths, names, strict=False)
                 ],

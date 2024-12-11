@@ -5,9 +5,8 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 
 from typing import override
 
-from scrapy import Request
-
 from crawler.core.DecisionNode import DecisionNode
+from crawler.core.Request import Request
 from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
 from crawler.models.dto.MetaChecker import MetaChecker

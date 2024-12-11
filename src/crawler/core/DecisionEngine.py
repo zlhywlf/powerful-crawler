@@ -5,8 +5,7 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 
 from abc import ABC, abstractmethod
 
-from scrapy import Request
-
+from crawler.core.Request import Request
 from crawler.models.dto.Context import Context
 from crawler.models.dto.Result import Result
 
