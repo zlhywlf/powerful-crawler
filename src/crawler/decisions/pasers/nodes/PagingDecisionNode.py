@@ -18,33 +18,25 @@ class PagingDecisionNode(DecisionNode):
 
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
-        t = 2
-        if meta.config:
-            if meta.config.get("needed"):
-                t = 1
-            text = await ctx.response.text
-            limit_match = re.search(meta.config.get("limit", ""), text)
-            limit = limit_match.group(1) if limit_match else None
-            count_match = re.search(meta.config.get("count", ""), text)
-            count = count_match.group(1) if count_match else None
-            url_match = re.search(meta.config.get("url", ""), text)
-            url = url_match.group(1) if url_match else None
-            pages = math.ceil(int(count) / int(limit))  # type:ignore  [arg-type]
-            return MetaChecker(
-                curr_meta=meta,
-                type=t,
-                result=[
-                    self.request_factory.create(
-                        url=url,
-                        formdata={"pageNumber": f"{page + 1}", "pageSize": limit},
-                        meta={"decision": meta.meta[0]} if meta.meta else None,
-                    )
-                    for page in range(pages)
-                    if page < 1
-                ],
-            )
+        t = 1 if meta.config.get("needed") else 2
+        text = await ctx.response.text
+        limit_match = re.search(meta.config.get("limit", ""), text)
+        limit = limit_match.group(1) if limit_match else None
+        count_match = re.search(meta.config.get("count", ""), text)
+        count = count_match.group(1) if count_match else None
+        url_match = re.search(meta.config.get("url", ""), text)
+        url = url_match.group(1) if url_match else None
+        pages = math.ceil(int(count) / int(limit))  # type:ignore  [arg-type]
         return MetaChecker(
             curr_meta=meta,
             type=t,
-            result=[],
+            result=[
+                self.request_factory.create(
+                    url=url,
+                    formdata={"pageNumber": f"{page + 1}", "pageSize": limit},
+                    meta={"decision": meta.meta[0]} if meta.meta else None,
+                )
+                for page in range(pages)
+                if page < 1
+            ],
         )
