@@ -16,7 +16,7 @@ class NextPageDecisionNode(DecisionNode):
 
     @override
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
-        t = 0
+        t = 2
         if meta.config:
             if meta.config.get("needed"):
                 t = 1
