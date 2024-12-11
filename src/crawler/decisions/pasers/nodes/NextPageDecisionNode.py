@@ -24,7 +24,7 @@ class NextPageDecisionNode(DecisionNode):
         result: list[Result | Request] | None = None
         if config.type == "css":
             next_pages = await ctx.response.extract_by_css(config.next_path)
-            next_meta = meta.model_copy()
+            next_meta = meta.model_copy(deep=True)
             next_meta.meta.append(meta)
             result = [
                 self.request_factory.create(
