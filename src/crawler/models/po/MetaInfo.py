@@ -18,7 +18,7 @@ class MetaInfo(Base):
     pid: Mapped[int] = mapped_column(ForeignKey("meta.id"), nullable=True)
     tid: Mapped[int] = mapped_column(ForeignKey("task.id"), nullable=True)
     name: Mapped[str] = mapped_column(String())
-    type: Mapped[int] = mapped_column(Integer())
+    type: Mapped[int] = mapped_column(Integer(), default=0)
     meta: Mapped[list["MetaInfo"]] = relationship(lazy="immediate")
     config: Mapped[str | None] = mapped_column(String(), nullable=True)
 

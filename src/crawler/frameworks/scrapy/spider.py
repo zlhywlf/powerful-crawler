@@ -60,17 +60,13 @@ async def init(index: int) -> None:
                     method="get",
                     meta=MetaInfo(
                         name="quotes",
-                        type=0,
                         meta=[
                             MetaInfo(
                                 name="NextPageDecisionNode",
-                                type=0,
                                 meta=[
                                     MetaInfo(
                                         name="SavePageDecisionNode",
                                         type=1,
-                                        meta=[],
-                                        config=None,
                                     )
                                 ],
                                 config=NextPageDecisionNode.Config(
@@ -80,11 +76,8 @@ async def init(index: int) -> None:
                             MetaInfo(
                                 name="SavePageDecisionNode",
                                 type=1,
-                                meta=[],
-                                config=None,
                             ),
                         ],
-                        config=None,
                     ),
                 ),
                 TaskInfo(
@@ -92,32 +85,23 @@ async def init(index: int) -> None:
                     method="get",
                     meta=MetaInfo(
                         name="湖北省公共资源产权交易网-paging",
-                        type=0,
                         meta=[
                             MetaInfo(
                                 name="PagingDecisionNode",
-                                type=0,
                                 meta=[
                                     MetaInfo(
                                         name="湖北省公共资源产权交易网-list",
-                                        type=0,
                                         meta=[
                                             MetaInfo(
                                                 name="ListPageDecisionNode",
-                                                type=0,
                                                 meta=[
                                                     MetaInfo(
                                                         name="湖北省公共资源产权交易网-detail",
-                                                        type=0,
                                                         meta=[
                                                             MetaInfo(
                                                                 name="SavePageDecisionNode",
-                                                                type=0,
-                                                                meta=[],
-                                                                config=None,
                                                             )
                                                         ],
-                                                        config=None,
                                                     )
                                                 ],
                                                 config=ListPageDecisionNode.Config(
@@ -126,7 +110,6 @@ async def init(index: int) -> None:
                                                 ).model_dump_json(),
                                             )
                                         ],
-                                        config=None,
                                     )
                                 ],
                                 config=PagingDecisionNode.Config(
@@ -136,7 +119,6 @@ async def init(index: int) -> None:
                                 ).model_dump_json(),
                             )
                         ],
-                        config=None,
                     ),
                 ),
             ])
