@@ -26,7 +26,7 @@ class ListPageDecisionNode(DecisionNode):
                 curr_meta=meta,
                 type=t,
                 result=[
-                    self.rf.create(
+                    self.request_factory.create(
                         url=ctx.response.urljoin(path),
                         meta={**({"decision": meta.meta[0]} if meta.meta else {}), "file_name": name},
                     )

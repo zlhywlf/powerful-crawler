@@ -28,7 +28,7 @@ class NextPageDecisionNode(DecisionNode):
                     curr_meta=meta,
                     type=t,
                     result=[
-                        self.rf.create(
+                        self.request_factory.create(
                             url=ctx.response.urljoin(next_page),
                             meta={
                                 "decision": next_meta,

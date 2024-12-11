@@ -34,7 +34,7 @@ class PagingDecisionNode(DecisionNode):
                 curr_meta=meta,
                 type=t,
                 result=[
-                    self.rf.create(
+                    self.request_factory.create(
                         url=url,
                         formdata={"pageNumber": f"{page + 1}", "pageSize": limit},
                         meta={"decision": meta.meta[0]} if meta.meta else None,

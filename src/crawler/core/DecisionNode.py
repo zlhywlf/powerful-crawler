@@ -14,14 +14,14 @@ from crawler.models.dto.MetaChecker import MetaChecker
 class DecisionNode(ABC):
     """decision node."""
 
-    def __init__(self, rf: RequestFactory) -> None:
+    def __init__(self, request_factory: RequestFactory) -> None:
         """Init."""
-        self._rf = rf
+        self._request_factory = request_factory
 
     @property
-    def rf(self) -> RequestFactory:
+    def request_factory(self) -> RequestFactory:
         """Request factory."""
-        return self._rf
+        return self._request_factory
 
     @abstractmethod
     async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
