@@ -9,15 +9,15 @@ from typing import Any
 from scrapy.http.response import Response
 
 from crawler.core.Request import Request
+from crawler.decisions.pasers.ListPageDecisionNode import ListPageDecisionNode
+from crawler.decisions.pasers.NextPageDecisionNode import NextPageDecisionNode
+from crawler.decisions.pasers.PagingDecisionNode import PagingDecisionNode
+from crawler.decisions.pasers.ParserDecisionEngine import ParserDecisionEngine
+from crawler.decisions.pasers.SavePageDecisionNode import SavePageDecisionNode
 from crawler.frameworks.scrapy.ScrapyRequestFactory import ScrapyRequestFactory
 from crawler.frameworks.scrapy.ScrapyResponse import ScrapyResponse
 from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
-from crawler.pasers.ListPageDecisionNode import ListPageDecisionNode
-from crawler.pasers.NextPageDecisionNode import NextPageDecisionNode
-from crawler.pasers.PagingDecisionNode import PagingDecisionNode
-from crawler.pasers.ParserDecisionEngine import ParserDecisionEngine
-from crawler.pasers.SavePageDecisionNode import SavePageDecisionNode
 
 
 class ScrapyPaser:
