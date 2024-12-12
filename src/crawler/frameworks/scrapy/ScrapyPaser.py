@@ -39,8 +39,7 @@ class ScrapyPaser:
             Meta.model_validate(response.meta.get("decision")),
             self._node_map,
         )
-        results = await engine.process(Context(response=ScrapyResponse(response)))
-        for result in results:
+        async for result in engine.process(Context(response=ScrapyResponse(response))):
             if isinstance(result, Request):
                 yield await result.revert()
             yield result

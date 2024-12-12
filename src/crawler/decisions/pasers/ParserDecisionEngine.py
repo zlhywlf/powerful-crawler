@@ -3,7 +3,7 @@
 Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 """
 
-from collections.abc import Mapping
+from collections.abc import AsyncGenerator, Mapping
 from typing import override
 
 from crawler.core.DecisionEngine import DecisionEngine
@@ -24,9 +24,8 @@ class ParserDecisionEngine(DecisionEngine):
         self._node_map = node_map
 
     @override
-    async def process(self, ctx: Context) -> list[Result | Request]:
+    async def process(self, ctx: Context) -> AsyncGenerator[Result | Request, None]:
         checker = MetaChecker(curr_meta=self._meta, type=self._meta.type)
-        result: list[Result | Request] | None = None
         while True:
             self._decide(checker)
             meta: Meta | None = checker.next_meta
@@ -35,11 +34,11 @@ class ParserDecisionEngine(DecisionEngine):
             ctx.checker = checker
             node = self._node_map[meta.name]
             checker = await node.handle(ctx, meta)
-            result = checker.result
-        if not result:
-            msg = f"process failure for {self._meta}"
-            raise RuntimeError(msg)
-        return result
+            if checker.result is None:
+                msg = f"process failure for {self._meta}"
+                raise RuntimeError(msg)
+            for _ in checker.result:
+                yield _
 
     def _decide(self, checker: MetaChecker) -> None:
         if not self._meta.meta:
