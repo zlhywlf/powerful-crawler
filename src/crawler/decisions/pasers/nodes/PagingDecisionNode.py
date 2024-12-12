@@ -5,22 +5,24 @@ Copyright (c) 2023-present 善假于PC也 (zlhywlf).
 
 import math
 import re
+from collections.abc import AsyncGenerator
 from typing import override
 
 from crawler.core.DecisionNode import DecisionNode
+from crawler.core.Request import Request
 from crawler.models.dto.BaseConfig import BaseConfig
 from crawler.models.dto.Context import Context
-from crawler.models.dto.Meta import Meta
-from crawler.models.dto.MetaChecker import MetaChecker
+from crawler.models.dto.Result import Result
 
 
 class PagingDecisionNode(DecisionNode):
     """paging decision node."""
 
     @override
-    async def handle(self, ctx: Context, meta: Meta) -> MetaChecker:
+    async def handle(self, ctx: Context) -> AsyncGenerator[Result | Request, None]:
+        meta = ctx.checker.meta
         config = PagingDecisionNode.Config.model_validate_json(meta.config)
-        t = 1 if config.needed else 2
+        ctx.checker.type = 1 if config.needed else 2
         text = await ctx.response.text
         limit_match = re.search(config.limit, text)
         limit = limit_match.group(1) if limit_match else None
@@ -29,19 +31,14 @@ class PagingDecisionNode(DecisionNode):
         url_match = re.search(config.url, text)
         url = url_match.group(1) if url_match else None
         pages = math.ceil(int(count) / int(limit))  # type:ignore  [arg-type]
-        return MetaChecker(
-            curr_meta=meta,
-            type=t,
-            result=[
-                self.request_factory.create(
-                    url=url,
-                    formdata={"pageNumber": f"{page + 1}", "pageSize": limit},
-                    meta={"decision": meta.meta[0]} if meta.meta else None,
-                )
-                for page in range(pages)
-                if page < 1
-            ],
-        )
+        for page in range(pages):
+            if page > 1:
+                break
+            yield self.request_factory.create(
+                url=url,
+                formdata={"pageNumber": f"{page + 1}", "pageSize": limit},
+                meta={"decision": meta.meta[0]} if meta.meta else None,
+            )
 
     class Config(BaseConfig):
         """config."""

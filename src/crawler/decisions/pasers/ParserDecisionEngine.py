@@ -25,25 +25,20 @@ class ParserDecisionEngine(DecisionEngine):
 
     @override
     async def process(self, ctx: Context) -> AsyncGenerator[Result | Request, None]:
-        checker = MetaChecker(curr_meta=self._meta, type=self._meta.type)
         while True:
-            self._decide(checker)
-            meta: Meta | None = checker.next_meta
-            if not meta or meta.name not in self._node_map:
+            surr_meta = ctx.checker.meta
+            self._decide(ctx.checker)
+            meta = ctx.checker.meta
+            if meta is surr_meta or meta.name not in self._node_map:
                 break
-            ctx.checker = checker
             node = self._node_map[meta.name]
-            checker = await node.handle(ctx, meta)
-            if checker.result is None:
-                msg = f"process failure for {self._meta}"
-                raise RuntimeError(msg)
-            for _ in checker.result:
-                yield _
+            async for result in node.handle(ctx):
+                yield result
 
     def _decide(self, checker: MetaChecker) -> None:
         if not self._meta.meta:
             return
         for meta in self._meta.meta:
             if meta.type == checker.type:
-                checker.next_meta = meta
+                checker.meta = meta
                 return

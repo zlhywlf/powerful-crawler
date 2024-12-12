@@ -13,4 +13,4 @@ class Context(BaseModel, arbitrary_types_allowed=True):
     """context."""
 
     response: Response
-    checker: MetaChecker | None = None
+    checker: MetaChecker

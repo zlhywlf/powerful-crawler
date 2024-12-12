@@ -18,6 +18,7 @@ from crawler.frameworks.scrapy.ScrapyRequestFactory import ScrapyRequestFactory
 from crawler.frameworks.scrapy.ScrapyResponse import ScrapyResponse
 from crawler.models.dto.Context import Context
 from crawler.models.dto.Meta import Meta
+from crawler.models.dto.MetaChecker import MetaChecker
 
 
 class ScrapyPaser:
@@ -35,11 +36,10 @@ class ScrapyPaser:
 
     async def __call__(self, response: Response) -> AsyncGenerator[Any, None]:
         """Parse."""
-        engine = ParserDecisionEngine(
-            Meta.model_validate(response.meta.get("decision")),
-            self._node_map,
-        )
-        async for result in engine.process(Context(response=ScrapyResponse(response))):
+        meta = Meta.model_validate(response.meta.get("decision"))
+        engine = ParserDecisionEngine(meta, self._node_map)
+        ctx = Context(response=ScrapyResponse(response), checker=MetaChecker(meta=meta, type=meta.type))
+        async for result in engine.process(ctx):
             if isinstance(result, Request):
                 yield await result.revert()
             yield result
